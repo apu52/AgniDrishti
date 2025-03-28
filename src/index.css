@@ -1,0 +1,85 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 10%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 85% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 16%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 16%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 0 85% 60%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 0 85% 60%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 12%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 0 85% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 16%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 0 85% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground bg-gradient-fire;
+  }
+
+  .notification-badge {
+    @apply absolute -top-2 -right-2 bg-fire rounded-full w-5 h-5 flex items-center justify-center text-xs text-white font-bold animate-notification-pulse;
+  }
+
+  .fire-text {
+    @apply text-fire animate-fire-glow;
+  }
+
+  .fire-card {
+    @apply border-fire/20 animate-fire-pulse;
+  }
+
+  .fire-gradient-bg {
+    background: linear-gradient(135deg, #331111 0%, #1a1a1a 100%);
+  }
+
+  .fire-button {
+    @apply bg-fire hover:bg-fire-dark transition-all duration-300;
+  }
+
+  .sos-button {
+    @apply bg-destructive hover:bg-destructive/90 text-destructive-foreground shadow-[0_0_15px_rgba(255,0,0,0.7)] hover:shadow-[0_0_25px_rgba(255,0,0,0.9)] transition-all duration-300;
+  }
+
+  .glow-border {
+    @apply border border-fire/50 shadow-[0_0_10px_rgba(255,77,77,0.5)];
+  }
+}
