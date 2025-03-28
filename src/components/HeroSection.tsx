@@ -60,13 +60,13 @@ const HeroSection = () => {
           </div>
           
           <div className="relative">
-            <div className="relative aspect-square md:aspect-[4/3] rounded-2xl overflow-hidden glow-border">
+            <div className="fixed inset-0 -z-10">
               <img 
                 src="firefighters-115800_1280.jpeg" 
                 alt="Firefighters in action" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover opacity-30"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent">
+              <div className="absolute inset-0 bg-black/30">
                 <div className="absolute bottom-0 left-0 right-0 p-6">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-2 h-2 bg-fire rounded-full animate-pulse"></div>

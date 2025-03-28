@@ -5,18 +5,18 @@ import { Link } from "react-router-dom";
 
 const CTASection = () => {
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-16 md:py-24 Z-20">
       <div className="container">
-        <div className="max-w-5xl mx-auto text-center">
+        <div className="max-w-5xl mx-auto text-center relative z-30">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-white">
             Ready to Enhance Your Fire Safety?
           </h2>
-          <p className="text-xl text-muted-foreground mb-12 max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground mb-12 max-w-3xl mx-auto drop-shadow-md">
             Join thousands of users already protected by अग्निदृष्टि's advanced fire detection and alert system
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div className="bg-black/40 border border-fire/20 rounded-xl p-6 flex flex-col items-center text-center">
+            <div className="bg-black/60 border border-fire/20 rounded-xl p-6 flex flex-col items-center text-center">
               <div className="w-16 h-16 rounded-full bg-fire/10 flex items-center justify-center mb-4">
                 <MapPin className="h-8 w-8 text-fire" />
               </div>
@@ -32,7 +32,7 @@ const CTASection = () => {
               </Button>
             </div>
             
-            <div className="bg-black/40 border border-fire/20 rounded-xl p-6 flex flex-col items-center text-center">
+            <div className="bg-black/60 border border-fire/20 rounded-xl p-6 flex flex-col items-center text-center">
               <div className="w-16 h-16 rounded-full bg-fire/10 flex items-center justify-center mb-4">
                 <Bot className="h-8 w-8 text-fire" />
               </div>
@@ -48,7 +48,7 @@ const CTASection = () => {
               </Button>
             </div>
             
-            <div className="bg-black/40 border border-fire/20 rounded-xl p-6 flex flex-col items-center text-center">
+            <div className="bg-black/60 border border-fire/20 rounded-xl p-6 flex flex-col items-center text-center">
               <div className="w-16 h-16 rounded-full bg-fire/10 flex items-center justify-center mb-4">
                 <Headphones className="h-8 w-8 text-fire" />
               </div>

@@ -67,36 +67,39 @@ const features = [
 
 const FeatureSection = () => {
   return (
-    <section className="py-16 md:py-24">
-      <div className="container">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
-            Comprehensive Fire Safety Features
-          </h2>
-          <p className="text-muted-foreground text-lg">
-            अग्निदृष्टि combines cutting-edge technology with practical solutions to prevent, detect, and respond to fire emergencies
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
-            <Card key={index} className="bg-black/40 border-fire/20 hover:border-fire/40 transition-all duration-300">
-              <CardHeader>
-                <div className="bg-fire/10 w-12 h-12 rounded-full flex items-center justify-center mb-4">
-                  <feature.icon className="h-6 w-6 text-fire" />
-                </div>
-                <CardTitle className="text-xl">{feature.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-muted-foreground text-base">
-                  {feature.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </section>
+    <section className="relative py-16 md:py-24 z-30"> {/* High z-index to stay above overlay */}
+  <div className="container">
+    <div className="text-center max-w-3xl mx-auto mb-16">
+      <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white drop-shadow-md">
+        Comprehensive Fire Safety Features
+      </h2>
+      <p className="text-white/80 text-lg"> {/* Improved contrast */}
+        अग्निदृष्टि combines cutting-edge technology with practical solutions to prevent, detect, and respond to fire emergencies
+      </p>
+    </div>
+    
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {features.map((feature, index) => (
+        <Card 
+          key={index} 
+          className="bg-black/70 backdrop-blur-sm border border-fire/30 hover:border-fire/50 transition-all duration-300 hover:shadow-lg hover:shadow-fire/20"
+        >
+          <CardHeader>
+            <div className="bg-fire/20 w-12 h-12 rounded-full flex items-center justify-center mb-4 border border-fire/30">
+              <feature.icon className="h-6 w-6 text-fire" />
+            </div>
+            <CardTitle className="text-xl text-white">{feature.title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CardDescription className="text-white/80 text-base"> {/* Improved contrast */}
+              {feature.description}
+            </CardDescription>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  </div>
+</section>
   );
 };
 

@@ -84,44 +84,51 @@ const StatisticsSection = () => {
   }, []);
 
   return (
-    <section className="py-16 bg-black/60">
-      <div className="container">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
-            Fire Safety Impact
-          </h2>
-          <p className="text-muted-foreground text-lg">
-            Real-time statistics and metrics showing our impact on fire detection and prevention
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {animatedStats.map((stat, index) => (
-            <div key={index} className="bg-black/40 border border-fire/20 rounded-xl p-6">
-              <div className="flex items-center mb-4">
-                <div className="bg-fire/10 w-12 h-12 rounded-full flex items-center justify-center mr-4">
-                  <stat.icon className="h-6 w-6 text-fire" />
-                </div>
-                <div>
-                  <h3 className="text-3xl font-bold">{stat.value}</h3>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Progress</span>
-                  <span className={`flex items-center ${stat.trend === 'up' ? 'text-green-500' : 'text-fire'}`}>
-                    {stat.change}
-                  </span>
-                </div>
-                <Progress value={stat.progress} className="h-2 bg-muted" indicatorClassName="bg-fire" />
-              </div>
+<section className="relative py-16 z-30 bg-black/80 backdrop-blur-sm">
+  <div className="container">
+    <div className="text-center max-w-3xl mx-auto mb-16">
+      <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white drop-shadow-lg">
+        Fire Safety Impact
+      </h2>
+      <p className="text-white/80 text-lg">
+        Real-time statistics and metrics showing our impact on fire detection and prevention
+      </p>
+    </div>
+    
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {animatedStats.map((stat, index) => (
+        <div 
+          key={index} 
+          className="bg-black/70 border border-fire/30 rounded-xl p-6 hover:border-fire/50 transition-all duration-300 hover:shadow-lg hover:shadow-fire/20"
+        >
+          <div className="flex items-center mb-4">
+            <div className="bg-fire/20 w-12 h-12 rounded-full flex items-center justify-center mr-4 border border-fire/30">
+              <stat.icon className="h-6 w-6 text-fire" />
             </div>
-          ))}
+            <div>
+              <h3 className="text-3xl font-bold text-white">{stat.value}</h3>
+              <p className="text-sm text-white/80">{stat.label}</p>
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-white/80">Progress</span>
+              <span className={`flex items-center ${stat.trend === 'up' ? 'text-green-400' : 'text-fire'}`}>
+                {stat.change}
+              </span>
+            </div>
+            <Progress 
+              value={stat.progress} 
+              className="h-2 bg-black/50" 
+              indicatorClassName={stat.trend === 'up' ? 'bg-green-400' : 'bg-fire'}
+            />
+          </div>
         </div>
-      </div>
-    </section>
+      ))}
+    </div>
+  </div>
+</section>
   );
 };
 
