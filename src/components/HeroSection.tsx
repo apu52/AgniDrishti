@@ -14,7 +14,7 @@ const HeroSection = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <div className="flex flex-col space-y-2">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight fire-text">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white">
                 अग्निदृष्टि
               </h1>
               <p className="text-xl md:text-2xl font-medium text-foreground/80">

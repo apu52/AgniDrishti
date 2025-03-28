@@ -15,7 +15,7 @@ const SOSSection = () => {
                   <span className="text-sm font-medium">Emergency Response</span>
                 </div>
                 
-                <h2 className="text-3xl md:text-4xl font-bold mb-4 fire-text">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
                   SOS Panic Button & Voice Commands
                 </h2>
                 
