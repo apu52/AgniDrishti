@@ -73,7 +73,7 @@ const FeatureSection = () => {
       <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white drop-shadow-md">
         Comprehensive Fire Safety Features
       </h2>
-      <p className="text-white/80 text-lg"> {/* Improved contrast */}
+      <p className="text-white/100 text-lg"> {/* Improved contrast */}
         अग्निदृष्टि combines cutting-edge technology with practical solutions to prevent, detect, and respond to fire emergencies
       </p>
     </div>
@@ -82,7 +82,7 @@ const FeatureSection = () => {
       {features.map((feature, index) => (
         <Card 
           key={index} 
-          className="bg-black/70 backdrop-blur-sm border border-fire/30 hover:border-fire/50 transition-all duration-300 hover:shadow-lg hover:shadow-fire/20"
+          className="bg-black/90 backdrop-blur-sm border border-fire/30 hover:border-fire/50 transition-all duration-300 hover:shadow-lg hover:shadow-fire/20"
         >
           <CardHeader>
             <div className="bg-fire/20 w-12 h-12 rounded-full flex items-center justify-center mb-4 border border-fire/30">

@@ -4,8 +4,11 @@ import { Button } from "@/components/ui/button";
 
 const SOSSection = () => {
   return (
-    <section className="relative py-16 z-30"> {/* High z-index to stay above overlay */}
-  <div className="container">
+    <section className="relative py-16 z-30">
+  {/* Black gradient background */}
+  <div className="absolute inset-0 bg-gradient-to-br from-black to-black/90 z-0 opacity-90"></div>
+  
+  <div className="container relative z-10">
     <div className="max-w-5xl mx-auto">
       <div className="bg-black/90 backdrop-blur-sm border-2 border-fire/40 rounded-2xl overflow-hidden shadow-xl shadow-fire/20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -20,7 +23,7 @@ const SOSSection = () => {
               SOS Panic Button & Voice Commands
             </h2>
             
-            <p className="text-white/80 mb-8"> {/* Improved contrast */}
+            <p className="text-white/80 mb-8">
               Instant emergency assistance with one touch or voice command. Automatically shares your location with emergency services and provides evacuation guidance.
             </p>
             

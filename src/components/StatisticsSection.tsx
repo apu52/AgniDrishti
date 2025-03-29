@@ -90,7 +90,7 @@ const StatisticsSection = () => {
       <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white drop-shadow-lg">
         Fire Safety Impact
       </h2>
-      <p className="text-white/80 text-lg">
+      <p className="text-white/100 text-lg">
         Real-time statistics and metrics showing our impact on fire detection and prevention
       </p>
     </div>

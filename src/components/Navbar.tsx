@@ -31,7 +31,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-black/80 backdrop-blur-md border-b border-fire/20">
+    <nav className="sticky top-0 z-50 w-full bg-black/100 backdrop-blur-md border-b border-fire/20">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <div className="flex items-center gap-2">
           <Sheet>
@@ -42,7 +42,7 @@ const Navbar = () => {
             </SheetTrigger>
             <SheetContent side="left" className="bg-gradient-fire border-r border-fire/20">
               <div className="flex flex-col gap-6 mt-8">
-                <Link to="/" className="flex items-center gap-2 text-fire font-bold text-xl">
+                <Link to="/" className="flex items-center gap-2 text-white font-bold text-xl">
                   <AlertTriangle className="h-6 w-6" />
                   <span>अग्निदृष्टि</span>
                 </Link>
