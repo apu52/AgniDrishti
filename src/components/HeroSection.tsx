@@ -222,7 +222,7 @@ const HeroSection = () => {
 
       <div className="container relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-12 items-center">
-          <div className="space-y-6 p-8 bg-transparent rounded-2xl border border-fire/30 max-w-3xl mx-auto">
+          <div className="space-y-6 p-8 bg-transparent rounded-2xl max-w-3xl mx-auto">
             <div className="flex flex-col space-y-2">
               <div className="relative h-24 flex items-center justify-center p-2 overflow-hidden">
                 <div className="absolute animate-slide text-4xl md:text-5xl lg:text-6xl bg-clip-text bg-gradient-to-tr from-red-500 via-orange-600 to-yellow-700 text-transparent font-bold tracking-tight ">
@@ -231,7 +231,7 @@ const HeroSection = () => {
                 <div className="absolute animate-slide englishagni text-4xl md:text-5xl lg:text-6xl  bg-clip-text bg-gradient-to-tr from-red-500 via-orange-600 to-yellow-700 text-transparent font-bold tracking-tight  opacity-0">
                   AgniDrishti
                 </div>
-                <div className="absolute bengaliagni animate-slide text-4xl md:text-5xl lg:text-6xl  bg-clip-text bg-gradient-to-tr from-red-500 via-orange-600 to-yellow-700 text-transparent font-bold tracking-tight  opacity-0">
+                <div className="absolute bengaliagni animate-slide text-5xl md:text-5xl lg:text-6xl  bg-clip-text bg-gradient-to-tr from-red-500 via-orange-600 to-yellow-700 text-transparent font-bold tracking-tight  opacity-0">
                   অগ্নিদৃষ্টি
                 </div>
               </div>
@@ -254,7 +254,7 @@ const HeroSection = () => {
               </Button>
               <Button
                 variant="outline"
-                className="border-white/30 hover:border-fire text-white hover:text-fire text-lg px-8 py-6 glow-border"
+                className="border-white/30 hover:border-fire text-white hover:text-white text-lg px-8 py-6 glow-fire"
                 asChild
               >
                 <Link to="/map">
