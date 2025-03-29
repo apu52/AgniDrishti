@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -82,4 +81,37 @@
   .glow-border {
     @apply border border-fire/50 shadow-[0_0_10px_rgba(255,77,77,0.5)];
   }
+}
+
+@keyframes slide {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  10% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  30% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+.animate-slide {
+  animation: slide 12s linear infinite;
+  height: 5rem; /* Match your heading height */
+}
+.englishagni {
+  animation-delay: 4s;
+}
+.bengaliagni {
+  animation-delay: 8s;
 }
