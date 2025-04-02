@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import PlaceholderPage from "./pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
+import FireComplaintPage from "./pages/FireComplaintPage";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
           <Route path="/privacy" element={<PlaceholderPage />} />
           <Route path="/terms" element={<PlaceholderPage />} />
           <Route path="/cookies" element={<PlaceholderPage />} />
+          <Route path="/complaint" element={<FireComplaintPage/>}/>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
