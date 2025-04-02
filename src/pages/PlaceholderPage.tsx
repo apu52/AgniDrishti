@@ -17,7 +17,6 @@ const PlaceholderPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       <main className="flex-1 py-20">
         <div className="container">
           <div className="max-w-3xl mx-auto text-center">
@@ -36,7 +35,7 @@ const PlaceholderPage = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      <Footer/>
     </div>
   );
 };
