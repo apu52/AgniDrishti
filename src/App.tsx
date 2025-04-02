@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +6,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import PlaceholderPage from "./pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
+import Navbar from "./components/Navbar";
+import Chatbot from "./pages/Chatbot";
+// import { Footer } from "react-day-picker";
+import Footer from "@/components/Footer";
 
 const queryClient = new QueryClient();
 
@@ -16,12 +19,13 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <Navbar />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/map" element={<PlaceholderPage />} />
           <Route path="/sos" element={<PlaceholderPage />} />
           <Route path="/alerts" element={<PlaceholderPage />} />
-          <Route path="/chat" element={<PlaceholderPage />} />
+          <Route path="/chat" element={<Chatbot />} />
           <Route path="/reports" element={<PlaceholderPage />} />
           <Route path="/contact" element={<PlaceholderPage />} />
           <Route path="/about" element={<PlaceholderPage />} />
@@ -37,6 +41,7 @@ const App = () => (
           <Route path="/cookies" element={<PlaceholderPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <Footer/>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
