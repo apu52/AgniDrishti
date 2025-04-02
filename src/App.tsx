@@ -11,6 +11,7 @@ import Navbar from "./components/Navbar";
 import Chatbot from "./pages/Chatbot";
 import Footer from "@/components/Footer";
 import FireComplaintPage from "./pages/FireComplaintPage";
+import FirePreventionPage from "./pages/FirePreventionPage";
 
 const queryClient = new QueryClient();
 
@@ -31,7 +32,6 @@ const App = () => (
           <Route path="/contact" element={<PlaceholderPage />} />
           <Route path="/about" element={<PlaceholderPage />} />
           <Route path="/register" element={<PlaceholderPage />} />
-          <Route path="/prevention" element={<PlaceholderPage />} />
           <Route path="/protocols" element={<PlaceholderPage />} />
           <Route path="/blog" element={<PlaceholderPage />} />
           <Route path="/faq" element={<PlaceholderPage />} />
@@ -41,6 +41,7 @@ const App = () => (
           <Route path="/terms" element={<PlaceholderPage />} />
           <Route path="/cookies" element={<PlaceholderPage />} />
           <Route path="/complaint" element={<FireComplaintPage/>}/>
+          <Route path ="/prevention" element ={<FirePreventionPage/>}/>
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer/>
