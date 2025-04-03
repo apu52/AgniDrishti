@@ -36,7 +36,8 @@ const features = [
   {
     icon: FileText,
     title: "Prevention Guides & Protocols",
-    description: "Multilingual safety steps for evacuation/fire control"
+    description: "Multilingual safety steps for evacuation/fire control",
+    link: "/prevention"  // Added link to prevention page
   },
   {
     icon: PieChart,
