@@ -51,7 +51,7 @@ const Chatbot: React.FC = () => {
               {
                 role: "system",
                 content:
-                  "You are AgniDrishti, a crisis-response chatbot specializing in fire safety and emergency guidance. ",
+                  "You are AgniDrishti, a crisis-response chatbot specializing in fire safety and emergency guidance. Keep responsing  in the given context only",
               },
               { role: "user", content: inputMessage },
             ],
