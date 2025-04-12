@@ -1,49 +1,122 @@
-# AgniDrishti
-Our Project for SBH 2025
 
 
-**Use your preferred IDE**
+# 🔥 AgniDrishti – Intelligent Fire Detection System
+**AgniDrishti** is an advanced fire detection system leveraging computer vision and machine learning to identify fire hazards in real-time. Designed to enhance safety measures, it provides prompt alerts to mitigate potential fire-related disasters
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🌟 Features
 
-Follow these steps:
+- **🔥 Real-Time Fire Detection*: Utilizes cutting-edge algorithms to detect fire in live video fees.
+- **📷 Camera Integration*: Seamlessly integrates with various camera systems for continuous monitorng.
+- **🔔 Instant Alert**: Sends immediate notifications upon fire detection to designated personel.
+- **📊 Analytics Dashboad**: Provides insightful analytics on fire incidents and system perforance.
+- **🛡️ Secure & Reliale**: Ensures data security and system reliability for critical enviroments.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 🛠️ TechStack
 
-# Step 3: Install the necessary dependencies.
-npm i
+| Technology       | Description                                |
+|------------------|--------------------------------------------|
+| **Frontend**     | React.js, Tailwind CSS                     |
+| **Backend**      | Node.js, Express.js                        |
+| **Machine Learning** | TensorFlow, OpenCV                     |
+| **Database**     | MongoDB                                    |
+| **Deployment**   | Docker, AWS                               |
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+---
+
+## 🚀 Getting Started
+
+Follow these steps to set up the project locally:
+
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/apu52/AgniDrishti.gi
+   ```
+
+
+2. **Navigate to the Project Directory**:
+   ```bash
+   cd AgniDrisht
+   ```
+
+
+3. **Install Dependencies**:
+   ```bash
+   npm instal
+   ```
+
+
+4. **Set Up Environment Variables*:
+   - Create a `.env` file in the root drectory
+   - Add the necessary environment variables as specified in `.env.xample`.
+
+5. **Start the Development Server**:
+   ```bash
+   npm run de
+   ```
+
+
+   The application will be running at `http://localhost:3000`.
+
+---
+
+## 📂 Project Sructure
+
+
+```plaintext
+AgniDrishti/
+├── public/
+├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── assets/
+│   └── ...
+├── .env.example
+├── .gitignore
+├── package.json
+├── README.md
+└─ ...
 ```
+
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🤝 Contributing
 
-**Use GitHub Codespaces**
+We welcome contributions to enhance **AgniDrishti**! To contribute:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1. **Fork the Repsitory**: Click on the 'Fork' button at the top right of the repostory page.
+2. **Clone Your Fork**:
+   ```bash
+   git clone https://github.com/your-username/AgniDrishti.it
+   ```
+
+3. **Create a New Branch**:
+   ```bash
+   git checkout -b feature/your-feature-nme
+   ```
+
+4. **Make Your hanges**: Implement your featre or fix.
+5. **Commit Your Changes**:
+   ```bash
+   git commit -m "Add your commit message hee"
+   ```
+
+6. **Push to Your Fork**:
+   ```bash
+   git push origin feature/your-feature-nme
+   ```
+
+7. **Create a Pull equest**: Navigate to the original repository and click on 'New Pul Request'.
 
-## What technologies are used for this project?
+---
 
-This project is built with .
+## �️ License
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+This project is licensed under the [MIT Licens](LICENSE).
+
+
+
