@@ -89,7 +89,7 @@ const Chatbot: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-[95vh] w-[90vw] max-w-xl mx-auto m-5 bg-gradient-to-br from-gray-900 to-gray-800 text-gray-100">
+    <div className="flex flex-col min-h-screen w-full mx-auto m-5 bg-gradient-to-br from-gray-900 to-gray-800 text-gray-100">
       <div className="border-b border-red-500/30 p-4 bg-gray-900/50">
         <div className="flex items-center space-x-3">
           <div className="h-2 w-2 animate-pulse rounded-full bg-red-500"></div>
