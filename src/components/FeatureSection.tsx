@@ -21,17 +21,21 @@ const features = [
   {
     icon: MapPin,
     title: "Fire Risk Zone Mapping",
-    description: "AI heatmaps identify high-risk zones using historical/real-time data"
+    description: "AI heatmaps identify high-risk zones using historical/real-time data",
+    link: "/MapPage"  // Added link to live dashboard page
+
   },
   {
     icon: PieChart,
     title: "Live Fire Tracking Dashboard",
-    description: "Real-time fire visualization with crowdsourced + sensor updates"
+    description: "Real-time fire visualization with crowdsourced + sensor updates",
+    link: "/Live_Dashboard"  // Added link to live dashboard page
   },
   {
     icon: PhoneCall,
     title: "SOS Panic Button & Helpline",
-    description: "One-touch emergency calls with auto-location sharing"
+    description: "One-touch emergency calls with auto-location sharing",
+    link: "/SOS_call"  // Added link to SOS call page
   },
   {
     icon: FileText,
@@ -42,12 +46,16 @@ const features = [
   {
     icon: PieChart,
     title: "Post-Fire Analysis & Reports",
-    description: "Data-driven heatmaps for damage assessment/insurance"
+    description: "Data-driven heatmaps for damage assessment/insurance",
+    link: "/postfireanalysis"  // Added link to SOS call page
+
   },
   {
     icon: Bot,
     title: "AI Crisis Chatbot",
-    description: "Multilingual 24/7 chatbot for fire FAQs and emergency bridging"
+    description: "Multilingual 24/7 chatbot for fire FAQs and emergency bridging",
+    link: "/Chatbot"  // Added link to SOS call page
+
   },
   {
     icon: Users,
@@ -58,12 +66,16 @@ const features = [
   {
     icon: Bell,
     title: "Crowdsourced Alerts",
-    description: "User-generated reports to validate and accelerate disaster response"
+    description: "User-generated reports to validate and accelerate disaster response",
+    link: "/crowdsourcealerts"  // Added link to SOS call page
+
   },
   {
     icon: Mic,
     title: "Voice-Activated Emergency Mode",
-    description: "\"Hey FireGuard, call help!\" – Voice commands for hands-free emergency response"
+    description: "\"Hey FireGuard, call help!\" – Voice commands for hands-free emergency response",
+    link: "/SOS_call"  // Added link to SOS call page
+
   }
 ];
 
