@@ -25,7 +25,7 @@ const CTASection = () => {
                 Check fire risks in your area with our interactive heatmap
               </p>
               <Button variant="link" className="text-fire mt-auto group" asChild>
-                <Link to="/map">
+                <Link to="/MapPage">
                   Explore Map
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
@@ -41,7 +41,7 @@ const CTASection = () => {
                 Get fire safety tips and emergency guidance from our AI assistant
               </p>
               <Button variant="link" className="text-fire mt-auto group" asChild>
-                <Link to="/chat">
+                <Link to="/Chatbot">
                   Start Chatting
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
@@ -57,7 +57,7 @@ const CTASection = () => {
                 Need help with setup or have questions about our services?
               </p>
               <Button variant="link" className="text-fire mt-auto group" asChild>
-                <Link to="/contact">
+                <Link to="/FeatureSection">
                   Get Support
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
