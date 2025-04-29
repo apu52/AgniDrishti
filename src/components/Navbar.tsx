@@ -111,11 +111,11 @@ const Navbar = () => {
   ]);
 
   const NAV_ITEMS = [
-    { to: "/map", icon: MapPin, label: "Fire Risk Map" },
-    { to: "/sos", icon: PhoneCall, label: "SOS Emergency" },
+    { to: "/MapPage", icon: MapPin, label: "Fire Risk Map" },
+    { to: "/SOS_call", icon: PhoneCall, label: "SOS Emergency" },
     { to: "/alerts", icon: AlertTriangle, label: "Fire Alerts" },
     { to: "/chat", icon: MessageSquare, label: "Crisis Chatbot" },
-    { to: "/reports", icon: FileText, label: "Reports" },
+    { to: "/postfireanalysis", icon: FileText, label: "Reports" },
   ];
 
   const unreadCount = notifications.filter((n) => !n.read).length;
