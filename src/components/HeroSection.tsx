@@ -248,7 +248,7 @@ const HeroSection = () => {
                 className="bg-fire hover:bg-fire/90 text-white text-lg px-8 py-6 glow-fire"
                 asChild
               >
-                <Link to="/sos">
+                <Link to="/SOS_call">
                   SOS Emergency <PhoneCall className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
@@ -257,7 +257,7 @@ const HeroSection = () => {
                 className="border-white/30 hover:border-fire text-white hover:text-white text-lg px-8 py-6 glow-fire"
                 asChild
               >
-                <Link to="/map">
+                <Link to="/MapPage">
                   View Fire Risk Map <MapPin className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
