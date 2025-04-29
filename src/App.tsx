@@ -14,6 +14,13 @@ import FireComplaintPage from "./pages/FireComplaintPage";
 import FirePreventionPage from "./pages/FirePreventionPage";
 import MapPage from "./pages/MapPage";
 import RegistrationPage from "./pages/RegistrationPage";
+import LiveDashboard from "./pages/Live_Dashboard";
+import SOS from "./pages/SOS_call";
+import PostFireAnalysis from "./pages/postfireanalysis";
+import Crowdsourcealerts from "./pages/crowdsourcealerts";
+import Featuresection from "./components/FeatureSection";
+
+
 
 const queryClient = new QueryClient();
 
@@ -26,7 +33,7 @@ const App = () => (
         <Navbar />
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/map" element={<MapPage />} />
+          <Route path="/MapPage" element={<MapPage />} />
           <Route path="/sos" element={<PlaceholderPage />} />
           <Route path="/alerts" element={<PlaceholderPage />} />
           <Route path="/chat" element={<Chatbot />} />
@@ -44,6 +51,14 @@ const App = () => (
           <Route path="/cookies" element={<PlaceholderPage />} />
           <Route path="/complaint" element={<FireComplaintPage/>}/>
           <Route path ="/prevention" element ={<FirePreventionPage/>}/>
+          <Route path ="/Live_Dashboard" element ={<LiveDashboard/>}/>
+          <Route path ="/SOS_call" element ={<SOS/>}/>
+          <Route path ="/Chatbot" element ={<Chatbot/>}/>
+          <Route path ="/postfireanalysis" element ={<PostFireAnalysis/>}/>
+          <Route path ="/crowdsourcealerts" element ={<Crowdsourcealerts/>}/>
+          <Route path ="/FeatureSection" element ={<Featuresection/>}/>
+
+
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer/>
