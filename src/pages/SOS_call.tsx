@@ -1,28 +1,49 @@
 import { useState, useEffect } from "react";
-import { 
-  PhoneCall, 
-  Plus, 
-  Shield, 
-  Bell, 
-  MapPin, 
-  Smartphone, 
-  Users, 
-  Trash2, 
-  AlertCircle, 
-  MessageSquare, 
-  Settings, 
-  AlertTriangle, 
-  Info
+import axios from "axios";
+import {
+  PhoneCall,
+  Plus,
+  Shield,
+  Bell,
+  MapPin,
+  Smartphone,
+  Users,
+  Trash2,
+  AlertCircle,
+  MessageSquare,
+  Settings,
+  AlertTriangle,
+  Info,
 } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Types
 interface EmergencyContact {
@@ -38,6 +59,7 @@ interface EmergencyContact {
 interface EmergencyService {
   id: string;
   name: string;
+  num: string;
   number: string;
   type: "fire" | "police" | "ambulance" | "disaster";
   icon: React.ReactNode;
@@ -52,64 +74,80 @@ interface AlertSetting {
 
 // Sample data
 const defaultEmergencyServices: EmergencyService[] = [
-  { 
-    id: "fire-1", 
-    name: "Kolkata Fire Services", 
-    number: "101", 
+  {
+    id: "fire-1",
+    name: "Kolkata Fire Services",
+    number: "101",
+    num: "+916290517107",
     type: "fire",
-    icon: <AlertTriangle className="h-5 w-5 text-red-500" />
+    icon: <AlertTriangle className="h-5 w-5 text-red-500" />,
   },
-  { 
-    id: "police-1", 
-    name: "Kolkata Police", 
-    number: "100", 
+  {
+    id: "police-1",
+    name: "Kolkata Police",
+    number: "100",
+    num: "+919038005306",
     type: "police",
-    icon: <Shield className="h-5 w-5 text-blue-500" /> 
+    icon: <Shield className="h-5 w-5 text-blue-500" />,
   },
-  { 
-    id: "ambulance-1", 
-    name: "Emergency Ambulance", 
-    number: "108", 
+  {
+    id: "ambulance-1",
+    name: "Emergency Ambulance",
+    num: "+918777240684",
+    number: "108",
     type: "ambulance",
-    icon: <PhoneCall className="h-5 w-5 text-green-500" /> 
+    icon: <PhoneCall className="h-5 w-5 text-green-500" />,
   },
-  { 
-    id: "disaster-1", 
-    name: "Disaster Management", 
-    number: "1070", 
+  {
+    id: "disaster-1",
+    name: "Disaster Management",
+    number: "1070",
+    num: "+919432456350",
     type: "disaster",
-    icon: <AlertCircle className="h-5 w-5 text-yellow-500" /> 
-  }
+    icon: <AlertCircle className="h-5 w-5 text-yellow-500" />,
+  },
 ];
 
 const sampleContacts: EmergencyContact[] = [
   {
     id: "contact-1",
-    name: "Rajan Sharma",
-    phone: "+91 98765 43210",
+    name: "Himadri Dey",
+    phone: "+919038005306",
     relation: "Family",
     isPrimary: true,
     sendLocation: true,
-    sendAlerts: true
+    sendAlerts: true,
   },
   {
     id: "contact-2",
-    name: "Priya Patel",
-    phone: "+91 87654 32109",
+    name: "Arpan Chowdhury",
+    phone: "+918777240684",
     relation: "Neighbor",
     isPrimary: false,
     sendLocation: true,
-    sendAlerts: true
+    sendAlerts: true,
   },
   {
     id: "contact-3",
-    name: "Amit Kumar",
-    phone: "+91 76543 21098",
+    name: "Suvrodeep Das",
+    phone: "+919432456350",
     relation: "Friend",
     isPrimary: false,
     sendLocation: false,
-    sendAlerts: true
-  }
+    sendAlerts: true,
+  },
+];
+
+const sampleContact: EmergencyContact[] = [
+  {
+    id: "contact-1",
+    name: "Himadri Dey",
+    phone: "+916290517107",
+    relation: "Family",
+    isPrimary: true,
+    sendLocation: true,
+    sendAlerts: true,
+  },
 ];
 
 const alertSettings: AlertSetting[] = [
@@ -117,38 +155,40 @@ const alertSettings: AlertSetting[] = [
     id: "alert-1",
     name: "SMS Alerts",
     description: "Send SMS alerts to your emergency contacts",
-    enabled: true
+    enabled: true,
   },
   {
     id: "alert-2",
     name: "Offline Mode",
     description: "Enable alerts even when device is offline",
-    enabled: true
+    enabled: true,
   },
   {
-    id: "alert-3", 
+    id: "alert-3",
     name: "Auto Location Share",
     description: "Automatically share your location during emergency",
-    enabled: true
+    enabled: true,
   },
   {
     id: "alert-4",
     name: "Sensor Trigger",
     description: "Auto-call emergency services when fire sensors detect a fire",
-    enabled: true
+    enabled: true,
   },
   {
     id: "alert-5",
     name: "Periodic Location Updates",
     description: "Send periodic location updates during emergencies",
-    enabled: false
-  }
+    enabled: false,
+  },
 ];
 
 // Main Component
 const SOSPanicButton = () => {
   const [contacts, setContacts] = useState<EmergencyContact[]>(sampleContacts);
-  const [emergencyServices, setEmergencyServices] = useState<EmergencyService[]>(defaultEmergencyServices);
+  const [emergencyServices, setEmergencyServices] = useState<
+    EmergencyService[]
+  >(defaultEmergencyServices);
   const [settings, setSettings] = useState<AlertSetting[]>(alertSettings);
   const [newContact, setNewContact] = useState<Partial<EmergencyContact>>({
     name: "",
@@ -156,10 +196,13 @@ const SOSPanicButton = () => {
     relation: "Family",
     isPrimary: false,
     sendLocation: true,
-    sendAlerts: true
+    sendAlerts: true,
   });
   const [isAddContactDialogOpen, setIsAddContactDialogOpen] = useState(false);
-  const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const [sosActivated, setSosActivated] = useState(false);
   const [currentTab, setCurrentTab] = useState("contacts");
 
@@ -172,16 +215,39 @@ const SOSPanicButton = () => {
   // Handle activating SOS
   const handleSOSActivation = () => {
     setSosActivated(true);
-    
-    // In a real app, this would:
-    // 1. Call emergency services API
-    // 2. Send SMS/alerts to emergency contacts
-    // 3. Share location with contacts and emergency services
-    
+
     setTimeout(() => {
-      alert("SOS activated! Emergency services have been notified and your location has been shared with your emergency contacts.");
+      alert(
+        "SOS activated! Emergency services have been notified and your location has been shared with your emergency contacts."
+      );
       setSosActivated(false);
     }, 2000);
+  };
+  const messagetoemergencycontacts = async (contacts: EmergencyContact[]) => {
+    try {
+      setSosActivated(true);
+      for (let i = 0; i < contacts.length; i++) {
+        const contact = contacts[i];
+        const message = `Hi ${contact.name} Sebanti Dasgupta this side. I am in a fire emergency right now. Please help me. My Address is 1/1b Raipur East Road Kolkata: 700032 near Jadavpur University`;
+        const call = await axios.post(
+          "https://agnidrishtibackend.onrender.com/api/v1/send-sms",
+          {
+            toNumber: contact.phone,
+            message: message,
+          }
+        );
+        console.log(call);
+        alert(
+          "SOS activated! Emergency services have been notified and your location has been shared with your emergency contacts."
+        );
+        setSosActivated(false);
+      }
+    } catch {
+      alert("Failed to send SMS");
+      setSosActivated(false);
+    } finally {
+      setSosActivated(false);
+    }
   };
 
   // Handle adding a new contact
@@ -190,17 +256,19 @@ const SOSPanicButton = () => {
       alert("Please enter name and phone number");
       return;
     }
-    
+
     const contact: EmergencyContact = {
       id: `contact-${Date.now()}`,
       name: newContact.name,
       phone: newContact.phone,
       relation: newContact.relation || "Other",
       isPrimary: newContact.isPrimary || false,
-      sendLocation: newContact.sendLocation !== undefined ? newContact.sendLocation : true,
-      sendAlerts: newContact.sendAlerts !== undefined ? newContact.sendAlerts : true
+      sendLocation:
+        newContact.sendLocation !== undefined ? newContact.sendLocation : true,
+      sendAlerts:
+        newContact.sendAlerts !== undefined ? newContact.sendAlerts : true,
     };
-    
+
     setContacts([...contacts, contact]);
     setNewContact({
       name: "",
@@ -208,22 +276,22 @@ const SOSPanicButton = () => {
       relation: "Family",
       isPrimary: false,
       sendLocation: true,
-      sendAlerts: true
+      sendAlerts: true,
     });
     setIsAddContactDialogOpen(false);
   };
 
   // Handle deleting a contact
   const handleDeleteContact = (id: string) => {
-    setContacts(contacts.filter(contact => contact.id !== id));
+    setContacts(contacts.filter((contact) => contact.id !== id));
   };
 
   // Handle setting a contact as primary
   const handleSetPrimary = (id: string) => {
     setContacts(
-      contacts.map(contact => ({
+      contacts.map((contact) => ({
         ...contact,
-        isPrimary: contact.id === id
+        isPrimary: contact.id === id,
       }))
     );
   };
@@ -231,34 +299,48 @@ const SOSPanicButton = () => {
   // Handle toggling settings
   const handleToggleSetting = (id: string) => {
     setSettings(
-      settings.map(setting => 
-        setting.id === id 
-          ? { ...setting, enabled: !setting.enabled } 
-          : setting
+      settings.map((setting) =>
+        setting.id === id ? { ...setting, enabled: !setting.enabled } : setting
       )
     );
   };
 
   // Handle contact setting toggle
-  const handleContactSettingToggle = (id: string, setting: "sendLocation" | "sendAlerts") => {
+  const handleContactSettingToggle = (
+    id: string,
+    setting: "sendLocation" | "sendAlerts"
+  ) => {
     setContacts(
-      contacts.map(contact => 
-        contact.id === id 
-          ? { ...contact, [setting]: !contact[setting] } 
+      contacts.map((contact) =>
+        contact.id === id
+          ? { ...contact, [setting]: !contact[setting] }
           : contact
       )
     );
   };
 
   // Mock call emergency service
-  const callEmergencyService = (service: EmergencyService) => {
-    alert(`Calling ${service.name} at ${service.number}...`);
-    // In a real app, this would use the device's calling functionality
+  const callEmergencyService = async (service: EmergencyService) => {
+    try {
+      const call = await axios.post(
+        "https://agnidrishtibackend.onrender.com/api/v1/initiate-call-vonage",
+        {
+          targetNumber: service.num,
+          message: `Hi ${service.name}. Sebanti Dasgupta this side. I am in a fire emergency right now. Please help me. My Address is 1/1b Raipur East Road Kolkata: 700032 near Jadavpur University`,
+        }
+      );
+      console.log(call);
+      alert(`Calling ${service.name} at ${service.number}...`);
+    } catch (error) {
+      console.log("Error calling emergency service:", error);
+    }
   };
 
   // Handle simulating a fire alert
   const simulateFireAlert = () => {
-    alert("FIRE ALERT: Fire detected in your premises! Notifying emergency contacts and services.");
+    alert(
+      "FIRE ALERT: Fire detected in your premises! Notifying emergency contacts and services."
+    );
     // In a real app, this would trigger the full SOS workflow
   };
 
@@ -272,7 +354,8 @@ const SOSPanicButton = () => {
             SOS Emergency Response
           </h1>
           <p className="text-white/80 text-lg">
-            One-touch emergency calls with auto-location sharing during fire outbreaks and other emergencies
+            One-touch emergency calls with auto-location sharing during fire
+            outbreaks and other emergencies
           </p>
         </div>
 
@@ -285,16 +368,18 @@ const SOSPanicButton = () => {
                 <div className="md:col-span-1 bg-gradient-to-br from-fire/70 to-fire/50 p-8 flex flex-col items-center justify-center">
                   <Button
                     className={`w-40 h-40 rounded-full border-4 ${
-                      sosActivated 
-                        ? "bg-red-600 border-white animate-pulse" 
+                      sosActivated
+                        ? "bg-red-600 border-white animate-pulse"
                         : "bg-fire border-white/70 hover:bg-red-600"
                     } shadow-lg flex flex-col items-center justify-center transition-all duration-300`}
-                    onClick={handleSOSActivation}
+                    onClick={() => messagetoemergencycontacts(sampleContacts)}
                     disabled={sosActivated}
                   >
                     <PhoneCall className="h-12 w-12 mb-2" />
                     <span className="text-xl font-bold">SOS</span>
-                    {sosActivated && <span className="text-sm mt-1">Calling...</span>}
+                    {sosActivated && (
+                      <span className="text-sm mt-1">Calling...</span>
+                    )}
                   </Button>
                   <p className="text-white/90 mt-6 text-center">
                     Press for immediate emergency assistance
@@ -303,7 +388,9 @@ const SOSPanicButton = () => {
 
                 {/* Quick Call Services */}
                 <div className="md:col-span-2 p-6">
-                  <h2 className="text-xl font-bold text-white mb-4">Quick Emergency Services</h2>
+                  <h2 className="text-xl font-bold text-white mb-4">
+                    Quick Emergency Services
+                  </h2>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {emergencyServices.map((service) => (
                       <Button
@@ -311,18 +398,22 @@ const SOSPanicButton = () => {
                         className="bg-black/50 border border-fire/20 hover:bg-fire/20 flex flex-col items-center justify-center p-4 h-auto"
                         onClick={() => callEmergencyService(service)}
                       >
-                        <div className="mb-2">
-                          {service.icon}
-                        </div>
-                        <span className="text-white font-medium text-sm">{service.name}</span>
-                        <span className="text-white/70 text-xs mt-1">{service.number}</span>
+                        <div className="mb-2">{service.icon}</div>
+                        <span className="text-white font-medium text-sm">
+                          {service.name}
+                        </span>
+                        <span className="text-white/70 text-xs mt-1">
+                          {service.number}
+                        </span>
                       </Button>
                     ))}
                   </div>
 
                   <div className="mt-6">
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-white font-medium">Your Current Location</h3>
+                      <h3 className="text-white font-medium">
+                        Your Current Location
+                      </h3>
                       <Badge className="bg-green-600/80">
                         <MapPin className="h-3 w-3 mr-1" />
                         Active
@@ -332,14 +423,17 @@ const SOSPanicButton = () => {
                       <div className="flex items-center">
                         <MapPin className="h-4 w-4 mr-2 text-fire" />
                         {currentLocation ? (
-                          <span>Lat: {currentLocation.lat.toFixed(4)}, Lng: {currentLocation.lng.toFixed(4)}</span>
+                          <span>
+                            Lat: {currentLocation.lat.toFixed(4)}, Lng:{" "}
+                            {currentLocation.lng.toFixed(4)}
+                          </span>
                         ) : (
                           <span>Acquiring location...</span>
                         )}
                       </div>
-                      <Button 
-                        size="sm" 
-                        variant="ghost" 
+                      <Button
+                        size="sm"
+                        variant="ghost"
                         className="text-fire hover:text-white hover:bg-fire/20"
                       >
                         Update
@@ -354,17 +448,30 @@ const SOSPanicButton = () => {
 
         {/* Main Content Tabs */}
         <div className="max-w-4xl mx-auto">
-          <Tabs defaultValue="contacts" value={currentTab} onValueChange={setCurrentTab}>
+          <Tabs
+            defaultValue="contacts"
+            value={currentTab}
+            onValueChange={setCurrentTab}
+          >
             <TabsList className="grid grid-cols-3 max-w-md mx-auto bg-black/50 border border-fire/30">
-              <TabsTrigger value="contacts" className="data-[state=active]:bg-fire/20 data-[state=active]:text-white text-white/70">
+              <TabsTrigger
+                value="contacts"
+                className="data-[state=active]:bg-fire/20 data-[state=active]:text-white text-white/70"
+              >
                 <Users className="h-4 w-4 mr-2" />
                 Emergency Contacts
               </TabsTrigger>
-              <TabsTrigger value="settings" className="data-[state=active]:bg-fire/20 data-[state=active]:text-white text-white/70">
+              <TabsTrigger
+                value="settings"
+                className="data-[state=active]:bg-fire/20 data-[state=active]:text-white text-white/70"
+              >
                 <Settings className="h-4 w-4 mr-2" />
                 Alert Settings
               </TabsTrigger>
-              <TabsTrigger value="test" className="data-[state=active]:bg-fire/20 data-[state=active]:text-white text-white/70">
+              <TabsTrigger
+                value="test"
+                className="data-[state=active]:bg-fire/20 data-[state=active]:text-white text-white/70"
+              >
                 <AlertCircle className="h-4 w-4 mr-2" />
                 Test System
               </TabsTrigger>
@@ -375,12 +482,17 @@ const SOSPanicButton = () => {
               <Card className="bg-black/80 border-fire/30">
                 <CardHeader className="bg-black/90 border-b border-fire/20 flex flex-row items-center justify-between">
                   <div>
-                    <CardTitle className="text-white">Emergency Contacts</CardTitle>
+                    <CardTitle className="text-white">
+                      Emergency Contacts
+                    </CardTitle>
                     <CardDescription className="text-white/70">
                       People to notify during fire emergencies
                     </CardDescription>
                   </div>
-                  <Dialog open={isAddContactDialogOpen} onOpenChange={setIsAddContactDialogOpen}>
+                  <Dialog
+                    open={isAddContactDialogOpen}
+                    onOpenChange={setIsAddContactDialogOpen}
+                  >
                     <DialogTrigger asChild>
                       <Button className="bg-fire hover:bg-fire/80 text-white">
                         <Plus className="h-4 w-4 mr-2" />
@@ -389,34 +501,48 @@ const SOSPanicButton = () => {
                     </DialogTrigger>
                     <DialogContent className="bg-black/90 border-fire/30 text-white">
                       <DialogHeader>
-                        <DialogTitle className="text-white">Add Emergency Contact</DialogTitle>
+                        <DialogTitle className="text-white">
+                          Add Emergency Contact
+                        </DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4 mt-4">
                         <div className="space-y-2">
                           <Label htmlFor="name">Name</Label>
-                          <Input 
-                            id="name" 
-                            placeholder="Contact name" 
-                            className="bg-black/70 border-fire/30 text-white" 
+                          <Input
+                            id="name"
+                            placeholder="Contact name"
+                            className="bg-black/70 border-fire/30 text-white"
                             value={newContact.name}
-                            onChange={(e) => setNewContact({...newContact, name: e.target.value})}
+                            onChange={(e) =>
+                              setNewContact({
+                                ...newContact,
+                                name: e.target.value,
+                              })
+                            }
                           />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="phone">Phone Number</Label>
-                          <Input 
-                            id="phone" 
-                            placeholder="+91 98765 43210" 
-                            className="bg-black/70 border-fire/30 text-white" 
+                          <Input
+                            id="phone"
+                            placeholder="+91 98765 43210"
+                            className="bg-black/70 border-fire/30 text-white"
                             value={newContact.phone}
-                            onChange={(e) => setNewContact({...newContact, phone: e.target.value})}
+                            onChange={(e) =>
+                              setNewContact({
+                                ...newContact,
+                                phone: e.target.value,
+                              })
+                            }
                           />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="relation">Relation</Label>
-                          <Select 
-                            value={newContact.relation} 
-                            onValueChange={(value) => setNewContact({...newContact, relation: value})}
+                          <Select
+                            value={newContact.relation}
+                            onValueChange={(value) =>
+                              setNewContact({ ...newContact, relation: value })
+                            }
                           >
                             <SelectTrigger className="bg-black/70 border-fire/30 text-white">
                               <SelectValue placeholder="Select relation" />
@@ -425,7 +551,9 @@ const SOSPanicButton = () => {
                               <SelectItem value="Family">Family</SelectItem>
                               <SelectItem value="Friend">Friend</SelectItem>
                               <SelectItem value="Neighbor">Neighbor</SelectItem>
-                              <SelectItem value="Colleague">Colleague</SelectItem>
+                              <SelectItem value="Colleague">
+                                Colleague
+                              </SelectItem>
                               <SelectItem value="Other">Other</SelectItem>
                             </SelectContent>
                           </Select>
@@ -434,36 +562,63 @@ const SOSPanicButton = () => {
                           <Switch
                             id="primary"
                             checked={newContact.isPrimary}
-                            onCheckedChange={(checked) => setNewContact({...newContact, isPrimary: checked})}
+                            onCheckedChange={(checked) =>
+                              setNewContact({
+                                ...newContact,
+                                isPrimary: checked,
+                              })
+                            }
                           />
-                          <Label htmlFor="primary">Set as primary contact</Label>
+                          <Label htmlFor="primary">
+                            Set as primary contact
+                          </Label>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Switch
                             id="location"
-                            checked={newContact.sendLocation !== undefined ? newContact.sendLocation : true}
-                            onCheckedChange={(checked) => setNewContact({...newContact, sendLocation: checked})}
+                            checked={
+                              newContact.sendLocation !== undefined
+                                ? newContact.sendLocation
+                                : true
+                            }
+                            onCheckedChange={(checked) =>
+                              setNewContact({
+                                ...newContact,
+                                sendLocation: checked,
+                              })
+                            }
                           />
-                          <Label htmlFor="location">Share location during emergency</Label>
+                          <Label htmlFor="location">
+                            Share location during emergency
+                          </Label>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Switch
                             id="alerts"
-                            checked={newContact.sendAlerts !== undefined ? newContact.sendAlerts : true}
-                            onCheckedChange={(checked) => setNewContact({...newContact, sendAlerts: checked})}
+                            checked={
+                              newContact.sendAlerts !== undefined
+                                ? newContact.sendAlerts
+                                : true
+                            }
+                            onCheckedChange={(checked) =>
+                              setNewContact({
+                                ...newContact,
+                                sendAlerts: checked,
+                              })
+                            }
                           />
                           <Label htmlFor="alerts">Send emergency alerts</Label>
                         </div>
                       </div>
                       <DialogFooter className="mt-6">
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           onClick={() => setIsAddContactDialogOpen(false)}
                           className="border-fire/40 text-white hover:bg-fire/20"
                         >
                           Cancel
                         </Button>
-                        <Button 
+                        <Button
                           onClick={handleAddContact}
                           className="bg-fire hover:bg-fire/80 text-white"
                         >
@@ -489,29 +644,37 @@ const SOSPanicButton = () => {
                               </div>
                               <div>
                                 <div className="flex items-center">
-                                  <h3 className="text-white font-medium">{contact.name}</h3>
+                                  <h3 className="text-white font-medium">
+                                    {contact.name}
+                                  </h3>
                                   {contact.isPrimary && (
-                                    <Badge className="ml-2 bg-fire/80">Primary</Badge>
+                                    <Badge className="ml-2 bg-fire/80">
+                                      Primary
+                                    </Badge>
                                   )}
                                 </div>
-                                <p className="text-white/70 text-sm">{contact.phone}</p>
-                                <p className="text-white/50 text-xs">{contact.relation}</p>
+                                <p className="text-white/70 text-sm">
+                                  {contact.phone}
+                                </p>
+                                <p className="text-white/50 text-xs">
+                                  {contact.relation}
+                                </p>
                               </div>
                             </div>
                             <div className="flex items-center">
                               {!contact.isPrimary && (
-                                <Button 
-                                  size="sm" 
-                                  variant="ghost" 
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
                                   className="text-white/70 hover:text-white hover:bg-fire/20 mr-1"
                                   onClick={() => handleSetPrimary(contact.id)}
                                 >
                                   Set Primary
                                 </Button>
                               )}
-                              <Button 
-                                size="sm" 
-                                variant="ghost" 
+                              <Button
+                                size="sm"
+                                variant="ghost"
                                 className="text-red-400 hover:text-red-500 hover:bg-red-500/10"
                                 onClick={() => handleDeleteContact(contact.id)}
                               >
@@ -524,9 +687,17 @@ const SOSPanicButton = () => {
                               <Switch
                                 id={`location-${contact.id}`}
                                 checked={contact.sendLocation}
-                                onCheckedChange={() => handleContactSettingToggle(contact.id, "sendLocation")}
+                                onCheckedChange={() =>
+                                  handleContactSettingToggle(
+                                    contact.id,
+                                    "sendLocation"
+                                  )
+                                }
                               />
-                              <Label htmlFor={`location-${contact.id}`} className="text-white/70 text-sm">
+                              <Label
+                                htmlFor={`location-${contact.id}`}
+                                className="text-white/70 text-sm"
+                              >
                                 <MapPin className="h-3 w-3 inline mr-1" />
                                 Share location
                               </Label>
@@ -535,9 +706,17 @@ const SOSPanicButton = () => {
                               <Switch
                                 id={`alerts-${contact.id}`}
                                 checked={contact.sendAlerts}
-                                onCheckedChange={() => handleContactSettingToggle(contact.id, "sendAlerts")}
+                                onCheckedChange={() =>
+                                  handleContactSettingToggle(
+                                    contact.id,
+                                    "sendAlerts"
+                                  )
+                                }
                               />
-                              <Label htmlFor={`alerts-${contact.id}`} className="text-white/70 text-sm">
+                              <Label
+                                htmlFor={`alerts-${contact.id}`}
+                                className="text-white/70 text-sm"
+                              >
                                 <Bell className="h-3 w-3 inline mr-1" />
                                 Send alerts
                               </Label>
@@ -551,7 +730,8 @@ const SOSPanicButton = () => {
                 <CardFooter className="bg-black/40 border-t border-fire/20 py-3 px-4">
                   <div className="text-white/60 text-sm">
                     <Info className="h-4 w-4 inline mr-1" />
-                    These contacts will be automatically notified during fire emergencies
+                    These contacts will be automatically notified during fire
+                    emergencies
                   </div>
                 </CardFooter>
               </Card>
@@ -569,17 +749,28 @@ const SOSPanicButton = () => {
                 <CardContent className="p-6">
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-white font-medium mb-3">Emergency Notification Settings</h3>
+                      <h3 className="text-white font-medium mb-3">
+                        Emergency Notification Settings
+                      </h3>
                       <div className="space-y-4">
                         {settings.map((setting) => (
-                          <div key={setting.id} className="flex items-center justify-between bg-black/40 border border-fire/20 rounded-lg p-3">
+                          <div
+                            key={setting.id}
+                            className="flex items-center justify-between bg-black/40 border border-fire/20 rounded-lg p-3"
+                          >
                             <div>
-                              <h4 className="text-white font-medium">{setting.name}</h4>
-                              <p className="text-white/70 text-sm">{setting.description}</p>
+                              <h4 className="text-white font-medium">
+                                {setting.name}
+                              </h4>
+                              <p className="text-white/70 text-sm">
+                                {setting.description}
+                              </p>
                             </div>
                             <Switch
                               checked={setting.enabled}
-                              onCheckedChange={() => handleToggleSetting(setting.id)}
+                              onCheckedChange={() =>
+                                handleToggleSetting(setting.id)
+                              }
                             />
                           </div>
                         ))}
@@ -587,9 +778,14 @@ const SOSPanicButton = () => {
                     </div>
 
                     <div>
-                      <h3 className="text-white font-medium mb-3">Emergency Message Template</h3>
+                      <h3 className="text-white font-medium mb-3">
+                        Emergency Message Template
+                      </h3>
                       <div className="bg-black/40 border border-fire/20 rounded-lg p-3">
-                        <Label htmlFor="message-template" className="text-white/70 text-sm mb-2 block">
+                        <Label
+                          htmlFor="message-template"
+                          className="text-white/70 text-sm mb-2 block"
+                        >
                           Customize the emergency message sent to your contacts
                         </Label>
                         <textarea
@@ -598,18 +794,26 @@ const SOSPanicButton = () => {
                           defaultValue="EMERGENCY ALERT: Fire detected at my location. Please help or call emergency services. My current location: [LOCATION_LINK]"
                         />
                         <div className="mt-2 text-white/50 text-xs">
-                          Use [LOCATION_LINK] to automatically include your location
+                          Use [LOCATION_LINK] to automatically include your
+                          location
                         </div>
                       </div>
                     </div>
 
                     <div>
-                      <h3 className="text-white font-medium mb-3">Fire Sensor Integration</h3>
+                      <h3 className="text-white font-medium mb-3">
+                        Fire Sensor Integration
+                      </h3>
                       <div className="bg-black/40 border border-fire/20 rounded-lg p-3">
                         <div className="flex items-center justify-between mb-3">
                           <div>
-                            <h4 className="text-white font-medium">Connect Fire Sensors</h4>
-                            <p className="text-white/70 text-sm">Link your Agnidrishti fire sensors to trigger automatic alerts</p>
+                            <h4 className="text-white font-medium">
+                              Connect Fire Sensors
+                            </h4>
+                            <p className="text-white/70 text-sm">
+                              Link your Agnidrishti fire sensors to trigger
+                              automatic alerts
+                            </p>
                           </div>
                           <Badge className="bg-green-600/80">Connected</Badge>
                         </div>
@@ -619,8 +823,12 @@ const SOSPanicButton = () => {
                               <AlertTriangle className="h-4 w-4 text-fire" />
                             </div>
                             <div>
-                              <h5 className="text-white text-sm">Living Room Sensor</h5>
-                              <p className="text-white/50 text-xs">Status: Active</p>
+                              <h5 className="text-white text-sm">
+                                Living Room Sensor
+                              </h5>
+                              <p className="text-white/50 text-xs">
+                                Status: Active
+                              </p>
                             </div>
                           </div>
                           <div className="bg-black/60 border border-fire/20 rounded-lg p-2 flex items-center">
@@ -628,8 +836,12 @@ const SOSPanicButton = () => {
                               <AlertTriangle className="h-4 w-4 text-fire" />
                             </div>
                             <div>
-                              <h5 className="text-white text-sm">Kitchen Sensor</h5>
-                              <p className="text-white/50 text-xs">Status: Active</p>
+                              <h5 className="text-white text-sm">
+                                Kitchen Sensor
+                              </h5>
+                              <p className="text-white/50 text-xs">
+                                Status: Active
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -649,7 +861,9 @@ const SOSPanicButton = () => {
             <TabsContent value="test" className="mt-6">
               <Card className="bg-black/80 border-fire/30">
                 <CardHeader className="bg-black/90 border-b border-fire/20">
-                  <CardTitle className="text-white">Test Emergency System</CardTitle>
+                  <CardTitle className="text-white">
+                    Test Emergency System
+                  </CardTitle>
                   <CardDescription className="text-white/70">
                     Verify your emergency response system is working correctly
                   </CardDescription>
@@ -657,58 +871,77 @@ const SOSPanicButton = () => {
                 <CardContent className="p-6">
                   <div className="space-y-6">
                     <div className="bg-black/40 border border-fire/20 rounded-lg p-4">
-                      <h3 className="text-white font-medium mb-2">Test Features</h3>
+                      <h3 className="text-white font-medium mb-2">
+                        Test Features
+                      </h3>
                       <p className="text-white/70 mb-4">
-                        Use these options to test different components of your emergency system without triggering actual emergency services.
+                        Use these options to test different components of your
+                        emergency system without triggering actual emergency
+                        services.
                       </p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Button 
+                        <Button
                           className="bg-fire/20 border border-fire/30 text-white hover:bg-fire/40"
-                          onClick={() => alert("Test message sent to your emergency contacts")}
+                          onClick={() =>
+                            alert(
+                              "Test message sent to your emergency contacts"
+                            )
+                          }
                         >
                           <MessageSquare className="h-4 w-4 mr-2" />
                           Test Alert Messages
                         </Button>
-                        <Button 
+                        <Button
                           className="bg-fire/20 border border-fire/30 text-white hover:bg-fire/40"
-                          onClick={() => alert("Location sharing test initiated")}
+                          onClick={() =>
+                            alert("Location sharing test initiated")
+                          }
                         >
                           <MapPin className="h-4 w-4 mr-2" />
                           Test Location Sharing
                         </Button>
-                        <Button 
+                        <Button
                           className="bg-fire/20 border border-fire/30 text-white hover:bg-fire/40"
-                          onClick={() => alert("Sensor connection verified successfully")}
+                          onClick={() =>
+                            alert("Sensor connection verified successfully")
+                          }
                         >
                           <AlertTriangle className="h-4 w-4 mr-2" />
                           Test Sensor Connection
                         </Button>
-                        <Button 
+                        <Button
                           className="bg-fire/20 border border-fire/30 text-white hover:bg-fire/40"
-                          onClick={() => alert("Offline mode test complete - system will function without internet")}
+                          onClick={() =>
+                            alert(
+                              "Offline mode test complete - system will function without internet"
+                            )
+                          }
                         >
                           <Smartphone className="h-4 w-4 mr-2" />
                           Test Offline Mode
                         </Button>
                       </div>
                     </div>
-                    
+
                     <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
                       <h3 className="text-white font-medium mb-2 flex items-center">
                         <AlertTriangle className="h-5 w-5 mr-2 text-red-500" />
                         Simulate Fire Emergency
                       </h3>
                       <p className="text-white/70 mb-4">
-                        This will simulate a complete fire emergency workflow without contacting real emergency services.
+                        This will simulate a complete fire emergency workflow
+                        without contacting real emergency services.
                       </p>
                       <div className="flex flex-col space-y-3">
                         <div className="bg-black/60 border border-red-500/30 rounded-lg p-3">
                           <p className="text-white/80 text-sm mb-2">
                             <Info className="h-4 w-4 inline mr-1 text-red-400" />
-                            This is only a test and will not contact actual emergency services. It will send test notifications to your selected contacts.
+                            This is only a test and will not contact actual
+                            emergency services. It will send test notifications
+                            to your selected contacts.
                           </p>
                         </div>
-                        <Button 
+                        <Button
                           className="bg-red-600 hover:bg-red-700 text-white"
                           onClick={simulateFireAlert}
                         >
@@ -719,19 +952,29 @@ const SOSPanicButton = () => {
                     </div>
 
                     <div className="bg-black/40 border border-fire/20 rounded-lg p-4">
-                      <h3 className="text-white font-medium mb-2">System Diagnostics</h3>
+                      <h3 className="text-white font-medium mb-2">
+                        System Diagnostics
+                      </h3>
                       <div className="space-y-3">
                         <div className="flex justify-between p-2 bg-black/30 rounded-md">
-                          <span className="text-white/80">Sensor Connection</span>
+                          <span className="text-white/80">
+                            Sensor Connection
+                          </span>
                           <Badge className="bg-green-600/80">Working</Badge>
                         </div>
                         <div className="flex justify-between p-2 bg-black/30 rounded-md">
-                          <span className="text-white/80">Location Services</span>
+                          <span className="text-white/80">
+                            Location Services
+                          </span>
                           <Badge className="bg-green-600/80">Active</Badge>
                         </div>
                         <div className="flex justify-between p-2 bg-black/30 rounded-md">
-                          <span className="text-white/80">Emergency Contacts</span>
-                          <Badge className="bg-green-600/80">{contacts.length} Configured</Badge>
+                          <span className="text-white/80">
+                            Emergency Contacts
+                          </span>
+                          <Badge className="bg-green-600/80">
+                            {contacts.length} Configured
+                          </Badge>
                         </div>
                         <div className="flex justify-between p-2 bg-black/30 rounded-md">
                           <span className="text-white/80">SMS Service</span>
@@ -758,18 +1001,28 @@ const SOSPanicButton = () => {
         {/* Footer */}
         <div className="max-w-4xl mx-auto mt-16 text-center">
           <p className="text-white/50 text-sm">
-            SOS Emergency Response System &copy; 2025 | Developed for Agnidrishti Fire Safety Solutions
+            SOS Emergency Response System &copy; 2025 | Developed for
+            Agnidrishti Fire Safety Solutions
           </p>
           <div className="flex items-center justify-center mt-4 space-x-4">
-            <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-fire/20">
+            <Button
+              variant="ghost"
+              className="text-white/70 hover:text-white hover:bg-fire/20"
+            >
               <MessageSquare className="h-4 w-4 mr-2" />
               Help
             </Button>
-            <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-fire/20">
+            <Button
+              variant="ghost"
+              className="text-white/70 hover:text-white hover:bg-fire/20"
+            >
               <Info className="h-4 w-4 mr-2" />
               About
             </Button>
-            <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-fire/20">
+            <Button
+              variant="ghost"
+              className="text-white/70 hover:text-white hover:bg-fire/20"
+            >
               <Settings className="h-4 w-4 mr-2" />
               Privacy
             </Button>
