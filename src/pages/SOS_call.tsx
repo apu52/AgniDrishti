@@ -44,6 +44,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { error } from "console";
 
 // Types
 interface EmergencyContact {
@@ -142,7 +143,7 @@ const sampleContact: EmergencyContact[] = [
   {
     id: "contact-1",
     name: "Himadri Dey",
-    phone: "+916290517107",
+    phone: "+919038005306",
     relation: "Family",
     isPrimary: true,
     sendLocation: true,
@@ -242,7 +243,9 @@ const SOSPanicButton = () => {
         );
         setSosActivated(false);
       }
-    } catch {
+    } catch (error) {
+      console.log(error);
+
       alert("Failed to send SMS");
       setSosActivated(false);
     } finally {
