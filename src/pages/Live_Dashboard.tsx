@@ -5,12 +5,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MapContainer, TileLayer, Marker, Popup, Tooltip } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip as RechartsTooltip, // Renamed to avoid conflict with Leaflet Tooltip
+  CartesianGrid,
+  ResponsiveContainer,
+} from 'recharts';
+
 
 // Type definitions
 type FireSeverity = "critical" | "high" | "medium" | "low" | "controlled";
 
 interface FireIncident {
-  id: string;
+  incidentId: string;
   location: {
     lat: number;
     lng: number;
@@ -35,6 +48,26 @@ interface KolkataArea {
   activeFires: number;
 }
 
+// Create custom fire icons
+const fireIcon = (severity: FireSeverity) => {
+  const iconColor = {
+    critical: 'red',
+    high: 'orange',
+    medium: 'yellow',
+    low: 'blue',
+    controlled: 'green'
+  };
+  
+  return new L.Icon({
+    iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${iconColor[severity]}.png`,
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+};
+
 // Sample data
 const kolkataAreas: KolkataArea[] = [
   { name: "Burrabazar", riskLevel: "high", activeFires: 2 },
@@ -46,10 +79,24 @@ const kolkataAreas: KolkataArea[] = [
   { name: "Barrackpore", riskLevel: "low", activeFires: 0 },
   { name: "Behala", riskLevel: "medium", activeFires: 1 }
 ];
-
+// Data for the fire trend chart
+const fireTrendData = [
+  { month: "Jan", incidents: 12 },
+  { month: "Feb", incidents: 18 },
+  { month: "Mar", incidents: 25 },
+  { month: "Apr", incidents: 31 },
+  { month: "May", incidents: 40 },
+  { month: "Jun", incidents: 22 },
+  { month: "Jul", incidents: 15 },
+  { month: "Aug", incidents: 19 },
+  { month: "Sep", incidents: 20 },
+  { month: "Oct", incidents: 28 },
+  { month: "Nov", incidents: 35 },
+  { month: "Dec", incidents: 38 },
+];
 const sampleFireIncidents: FireIncident[] = [
   {
-    id: "fire-001",
+    incidentId: "fire-001",
     location: {
       lat: 22.5726,
       lng: 88.3639,
@@ -67,7 +114,7 @@ const sampleFireIncidents: FireIncident[] = [
     verifiedReports: 8
   },
   {
-    id: "fire-002",
+    incidentId: "fire-002",
     location: {
       lat: 22.5958,
       lng: 88.3699,
@@ -85,7 +132,7 @@ const sampleFireIncidents: FireIncident[] = [
     verifiedReports: 3
   },
   {
-    id: "fire-003",
+    incidentId: "fire-003",
     location: {
       lat: 22.6139,
       lng: 88.3879,
@@ -102,7 +149,7 @@ const sampleFireIncidents: FireIncident[] = [
     verifiedReports: 7
   },
   {
-    id: "fire-004",
+    incidentId: "fire-004",
     location: {
       lat: 22.5646,
       lng: 88.3531,
@@ -120,7 +167,7 @@ const sampleFireIncidents: FireIncident[] = [
     verifiedReports: 12
   },
   {
-    id: "fire-005",
+    incidentId: "fire-005",
     location: {
       lat: 22.5033,
       lng: 88.3454,
@@ -209,14 +256,14 @@ const LiveFireDashboard = () => {
   const verifyReport = (id: string) => {
     // Find and update the incident
     const updatedIncidents = filteredIncidents.map(incident => 
-      incident.id === id 
+      incident.incidentId === id 
         ? {...incident, verifiedReports: incident.verifiedReports + 1} 
         : incident
     );
     setFilteredIncidents(updatedIncidents);
     
     // Update selected incident if it's the one being verified
-    if (selectedIncident && selectedIncident.id === id) {
+    if (selectedIncident && selectedIncident.incidentId === id) {
       setSelectedIncident({
         ...selectedIncident, 
         verifiedReports: selectedIncident.verifiedReports + 1
@@ -294,9 +341,9 @@ const LiveFireDashboard = () => {
                 <div className="divide-y divide-fire/10">
                   {filteredIncidents.map((incident) => (
                     <div 
-                      key={incident.id}
+                      key={incident.incidentId}
                       className={`p-4 hover:bg-fire/10 cursor-pointer transition-colors ${
-                        selectedIncident?.id === incident.id ? "bg-fire/20" : ""
+                        selectedIncident?.incidentId === incident.incidentId ? "bg-fire/20" : ""
                       }`}
                       onClick={() => setSelectedIncident(incident)}
                     >
@@ -358,42 +405,62 @@ const LiveFireDashboard = () => {
               <TabsContent value="map" className="mt-4">
                 <Card className="bg-black/80 border-fire/30">
                   <CardContent className="p-0">
-                    <div className="relative w-full h-[60vh] bg-gray-900 flex justify-center items-center">
-                      {/* Placeholder for actual map - would use a library like react-leaflet or google-maps-react */}
-                      <div className="relative w-full h-full">
-                        <img 
-                          src="image.png" 
-                          alt="Kolkata Fire Map" 
-                          className="w-full h-full object-cover opacity-60" 
+                    <div className="relative w-full h-[60vh] bg-gray-900">
+                      <MapContainer 
+                        center={[22.5726, 88.3639]} 
+                        zoom={12} 
+                        style={{ height: '100%', width: '100%' }}
+                        className="z-0"
+                      >
+                        <TileLayer
+                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         />
-                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                          <AlertTriangle className="h-16 w-16 text-fire mb-4" />
-                          <p className="text-white text-lg text-center px-4">
-                            Interactive fire map would be displayed here.<br/>
-                            Shows real-time fire locations across Kolkata.
-                          </p>
-                        </div>
                         
-                        {/* Fire Alert Markers - these would be positioned properly on the actual map */}
-                        {filteredIncidents.map((incident, idx) => (
-                          <div 
-                            key={idx} 
-                            className={`absolute p-1 rounded-full animate-pulse ${
-                              incident.severity === "critical" ? "bg-red-600" :
-                              incident.severity === "high" ? "bg-orange-500" : 
-                              incident.severity === "medium" ? "bg-yellow-500" : "bg-blue-500"
-                            }`}
-                            style={{
-                              left: `${30 + idx * 15}%`,
-                              top: `${20 + idx * 10}%`,
-                              transform: "translate(-50%, -50%)",
-                              boxShadow: "0 0 15px rgba(255, 100, 50, 0.8)"
+                        {filteredIncidents.map((incident) => (
+                          <Marker
+                            key={incident.incidentId}
+                            position={[incident.location.lat, incident.location.lng]}
+                            icon={fireIcon(incident.severity)}
+                            eventHandlers={{
+                              click: () => {
+                                  setSelectedIncident(incident);
+                                  setCurrentTab('details');
+                              },
                             }}
                           >
-                            <div className={`w-4 h-4 rounded-full bg-fire/80`}></div>
-                          </div>
+                            <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent={false}>
+                              <div className="text-sm font-medium">
+                                {incident.location.area} - {incident.severity.toUpperCase()}
+                              </div>
+                            </Tooltip>
+                            
+                            <Popup>
+                              <div className="space-y-1">
+                                <h3 className="font-bold">{incident.location.area}</h3>
+                                <p className="text-sm">{incident.location.address}</p>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-xs">Severity:</span>
+                                  <Badge className={getSeverityColor(incident.severity) + ' text-xs'}>
+                                    {incident.severity.toUpperCase()}
+                                  </Badge>
+                                </div>
+                                <p className="text-xs">Reported: {formatDate(incident.reportTime)}</p>
+                                <Button 
+                                  size="sm" 
+                                  className="mt-2 w-full text-xs"
+                                  onClick={() => {
+                                    setSelectedIncident(incident);
+                                    setCurrentTab('details');
+                                  }}
+                                >
+                                  View Details
+                                </Button>
+                              </div>
+                            </Popup>
+                          </Marker>
                         ))}
-                      </div>
+                      </MapContainer>
                     </div>
                   </CardContent>
                 </Card>
@@ -435,7 +502,7 @@ const LiveFireDashboard = () => {
                         </Badge>
                       </div>
                       <CardDescription className="text-white/70">
-                        ID: {selectedIncident.id}
+                        ID: {selectedIncident.incidentId}
                       </CardDescription>
                     </CardHeader>
                     
@@ -511,7 +578,7 @@ const LiveFireDashboard = () => {
                             
                             <Button 
                               className="w-full bg-fire/80 hover:bg-fire text-white"
-                              onClick={() => verifyReport(selectedIncident.id)}
+                              onClick={() => verifyReport(selectedIncident.incidentId)}
                             >
                               <Users className="mr-2 h-4 w-4" />
                               Verify This Report
@@ -579,6 +646,17 @@ const LiveFireDashboard = () => {
                         {/* Placeholder for actual chart - would use a library like Recharts */}
                         <div className="text-center text-white/70">
                           Fire incident trend chart would appear here
+                          <div className="bg-black/40 border border-fire/20 rounded-lg p-4 h-94">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={fireTrendData} margin={{ top: 10, right: 60, left: 0, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                            <XAxis dataKey="month" stroke="#fff" fontSize={12} />
+                            <YAxis stroke="#fff" fontSize={12} />
+                            <RechartsTooltip contentStyle={{ backgroundColor: "#111", borderColor: "#666", color: "#fff" }} />
+                            <Line type="monotone" dataKey="incidents" stroke="#f87171" strokeWidth={2} dot={{ r: 4 }} />
+                          </LineChart> 
+                          </ResponsiveContainer> 
+                          </div>
                         </div>
                       </div>
                     </div>

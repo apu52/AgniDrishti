@@ -16,6 +16,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet.heat';
 
 // Language dictionary
 const translations = {
@@ -163,11 +167,11 @@ const translations = {
     casualtiesInjuries: "মৃত্যু / আহত",
     downloadDetailedReport: "বিস্তারিত রিপোর্ট ডাউনলোড করুন",
     noReportsFound: "কোন রিপোর্ট পাওয়া যায়নি",
-    tryAdjusting: "আপনার অনুসন্ধান বা ফিল্টার সমন্বয় করার চেষ্টা করুন",
+    tryAdjusting: "আপনার অনুসন্ধান বা ফিল্টর সমন্বয় করার চেষ্টা করুন",
     heatmapTitle: "কলকাতা অগ্নিকাণ্ড হিটম্যাপ",
     heatmapSubtitle: "অগ্নিকাণ্ড এবং ক্ষতির ভৌগলিক বিতরণ",
     year: "বছর",
-    filters: "ফিল্টার",
+    filters: "ফিল্টর",
     heatmapDescription: "এই ভিজ্যুয়ালাইজেশন স্যাটেলাইট ইমেজারি, সেন্সর ডেটা এবং রিপোর্ট করা ঘটনা ব্যবহার করে কলকাতা জুড়ে অগ্নিকাণ্ডের ঝুঁকিপূর্ণ এলাকার রিয়েল-টাইম হিটম্যাপ তৈরি করে",
     highestRiskAreas: "সর্বাধিক ঝুঁকিপূর্ণ এলাকা",
     mostImprovedAreas: "সবচেয়ে উন্নত এলাকা",
@@ -209,6 +213,8 @@ const fireIncidents = [
   {
     id: 1,
     location: "Burrabazar Market",
+    lat: 22.5726,
+    lng: 88.3639,
     date: "2025-03-15",
     damageLevel: "Severe",
     affectedArea: "2,500 sq meters",
@@ -221,6 +227,8 @@ const fireIncidents = [
   {
     id: 2,
     location: "Howrah Industrial Estate",
+    lat: 22.5958,
+    lng: 88.3699,
     date: "2025-02-28",
     damageLevel: "Moderate",
     affectedArea: "1,200 sq meters",
@@ -233,6 +241,8 @@ const fireIncidents = [
   {
     id: 3,
     location: "Salt Lake Sector V",
+    lat: 22.5646,
+    lng: 88.3531,
     date: "2025-04-02",
     damageLevel: "Minor",
     affectedArea: "450 sq meters",
@@ -245,6 +255,8 @@ const fireIncidents = [
   {
     id: 4,
     location: "Sealdah Station Area",
+    lat: 22.6139,
+    lng: 88.3879,
     date: "2025-01-10",
     damageLevel: "Severe",
     affectedArea: "3,200 sq meters",
@@ -257,6 +269,8 @@ const fireIncidents = [
   {
     id: 5,
     location: "New Market Area",
+    lat: 22.5033,
+    lng: 88.3454,
     date: "2025-03-22",
     damageLevel: "Moderate",
     affectedArea: "850 sq meters",
@@ -266,6 +280,18 @@ const fireIncidents = [
     injuries: 2,
     reportUrl: "/reports/newmarket-22032025.pdf"
   }
+];
+
+// Heatmap data points [lat, lng, intensity]
+const heatmapPoints = [
+  [22.5726, 88.3639, 0.9],  // Burrabazar - high intensity
+  [22.5958, 88.3699, 0.7],  // Howrah - medium
+  [22.5646, 88.3531, 0.8],  // New Market
+  [22.6139, 88.3879, 0.9],  // Sealdah
+  [22.5033, 88.3454, 0.5],  // Behala - lower
+  [22.5833, 88.3667, 0.6],  // Additional points
+  [22.5933, 88.3567, 0.4],
+  [22.5633, 88.3733, 0.7]
 ];
 
 // Sample data for heatmap visualization
@@ -325,9 +351,48 @@ const damageLevels: DamageLevel = {
   }
 };
 
+// Heatmap Layer Component
+const HeatmapLayer = ({ points }: { points: Array<[number, number, number]> }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map) return;
+
+    // @ts-ignore - Leaflet.heat doesn't have proper TypeScript definitions
+    const heatLayer = L.heatLayer(points, {
+      radius: 25,
+      blur: 15,
+      maxZoom: 17,
+      minOpacity: 0.5,
+      gradient: { 
+        0.4: 'blue', 
+        0.6: 'cyan', 
+        0.7: 'lime', 
+        0.8: 'yellow', 
+        1.0: 'red' 
+      }
+    }).addTo(map);
+
+    return () => {
+      map.removeLayer(heatLayer);
+    };
+  }, [map, points]);
+
+  return null;
+};
+
+// Custom fire icon
+const fireIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
 // Mock function for report download
 const downloadReport = (reportUrl: string, location: string) => {
-  // In a real implementation, this would trigger the file download
   alert(`Downloading report for ${location}...`);
   console.log(`Download URL: ${reportUrl}`);
 };
@@ -357,9 +422,6 @@ const PostFireAnalysis = () => {
         incident.location === selectedLocation
       );
     }
-    
-    // Apply timeframe filter (simplified for demo)
-    // Would use actual date filtering in production
     
     setFilteredIncidents(results);
   }, [searchQuery, selectedLocation, selectedTimeframe]);
@@ -555,11 +617,37 @@ const PostFireAnalysis = () => {
               </CardHeader>
               <CardContent>
                 <div className="mb-8">
-                  <div className="relative bg-black/50 border border-fire/20 rounded-lg p-4 h-96">
-                    {/* Placeholder for actual heatmap visualization */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <img src="src\components\map-big-data-modern-city_1217-1772.avif" alt="Kolkata Fire Heatmap" className="max-h-full object-contain rounded opacity-80" />
-                    </div>
+                  <div className="relative bg-black/50 border border-fire/20 rounded-lg p-4 h-[500px]">
+                    <MapContainer 
+                      center={[22.5726, 88.3639]} 
+                      zoom={13} 
+                      style={{ height: '100%', width: '100%' }}
+                      className="z-0 rounded-md"
+                    >
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      />
+                      
+                      <HeatmapLayer points={heatmapPoints} />
+                      
+                      {fireIncidents.map(incident => (
+                        <Marker
+                          key={incident.id}
+                          position={[incident.lat, incident.lng]}
+                          icon={fireIcon}
+                        >
+                          <Popup>
+                            <div className="space-y-1">
+                              <h3 className="font-bold">{incident.location}</h3>
+                              <p>Severity: {incident.damageLevel}</p>
+                              <p>Date: {incident.date}</p>
+                              <p>Loss: {incident.estimatedLoss}</p>
+                            </div>
+                          </Popup>
+                        </Marker>
+                      ))}
+                    </MapContainer>
                   </div>
                   <p className="text-sm text-gray-400 mt-3">{texts.heatmapDescription}</p>
                 </div>
@@ -598,7 +686,6 @@ const PostFireAnalysis = () => {
               </CardFooter>
             </Card>
           </TabsContent>
-
           {/* ANALYTICS TAB */}
           <TabsContent value="analytics" className="mt-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
