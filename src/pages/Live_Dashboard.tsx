@@ -641,25 +641,35 @@ const LiveFireDashboard = () => {
                     </div>
                     
                     <div className="mb-6">
-                      <h3 className="text-fire font-medium mb-3">Monthly Fire Incident Trends</h3>
-                      <div className="bg-black/40 border border-fire/20 rounded-lg p-4 h-64 flex items-center justify-center">
-                        {/* Placeholder for actual chart - would use a library like Recharts */}
-                        <div className="text-center text-white/70">
-                          Fire incident trend chart would appear here
-                          <div className="bg-black/40 border border-fire/20 rounded-lg p-4 h-94">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={fireTrendData} margin={{ top: 10, right: 60, left: 0, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                            <XAxis dataKey="month" stroke="#fff" fontSize={12} />
-                            <YAxis stroke="#fff" fontSize={12} />
-                            <RechartsTooltip contentStyle={{ backgroundColor: "#111", borderColor: "#666", color: "#fff" }} />
-                            <Line type="monotone" dataKey="incidents" stroke="#f87171" strokeWidth={2} dot={{ r: 4 }} />
-                          </LineChart> 
-                          </ResponsiveContainer> 
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                       <h3 className="text-fire font-medium mb-3">Monthly Fire Incident Trends</h3>
+                       <div className="bg-black/40 border border-fire/20 rounded-lg p-4 h-64">
+                       <ResponsiveContainer width="100%" height="100%">
+                        <LineChart
+                           data={fireTrendData}
+                           margin={{ top: 10, right: 60, left: 0, bottom: 0 }}
+                          >
+                          <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                          <XAxis dataKey="month" stroke="#fff" fontSize={12} />
+                          <YAxis stroke="#fff" fontSize={12} />
+                          <RechartsTooltip
+                            contentStyle={{
+                             backgroundColor: "#111",
+                              borderColor: "#666",
+                              color: "#fff",
+                            }}
+                          />
+                         <Line
+                          type="monotone"
+                          dataKey="incidents"
+                          stroke="#f87171"
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                         />
+                        </LineChart>
+                       </ResponsiveContainer>
+                       </div>
+                 </div>
+
                     
                     <div>
                       <h3 className="text-fire font-medium mb-3">Risk Factors</h3>
