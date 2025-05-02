@@ -20,6 +20,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.heat';
+import { jsPDF } from "jspdf";
 
 // Language dictionary
 const translations = {
@@ -82,7 +83,12 @@ const translations = {
     severe: "Severe",
     moderate: "Moderate",
     minor: "Minor",
-    language: "Language"
+    language: "Language",
+    date: "Date",
+    damageLevel: "Damage Level",
+    reportDetails: "Report Details",
+    generatedOn: "Generated on",
+    claimsStatistics: "Claims Statistics"
   },
   hi: {
     title: "अग्नि के बाद विश्लेषण और रिपोर्ट",
@@ -143,7 +149,12 @@ const translations = {
     severe: "गंभीर",
     moderate: "मध्यम",
     minor: "मामूली",
-    language: "भाषा"
+    language: "भाषा",
+    date: "दिनांक",
+    damageLevel: "क्षति का स्तर",
+    reportDetails: "रिपोर्ट विवरण",
+    generatedOn: "उत्पन्न किया गया",
+    claimsStatistics: "दावा आंकड़े"
   },
   bn: {
     title: "অগ্নিকাণ্ডের পরে বিশ্লেষণ এবং রিপোর্ট",
@@ -204,7 +215,12 @@ const translations = {
     severe: "গুরুতর",
     moderate: "মাঝারি",
     minor: "সামান্য",
-    language: "ভাষা"
+    language: "ভাষা",
+    date: "তারিখ",
+    damageLevel: "ক্ষতির মাত্রা",
+    reportDetails: "রিপোর্ট বিবরণ",
+    generatedOn: "জেনারেট করা হয়েছে",
+    claimsStatistics: "দাবি পরিসংখ্যান"
   }
 };
 
@@ -283,7 +299,7 @@ const fireIncidents = [
 ];
 
 // Heatmap data points [lat, lng, intensity]
-const heatmapPoints = [
+const heatmapPoints: [number, number, number][] = [
   [22.5726, 88.3639, 0.9],  // Burrabazar - high intensity
   [22.5958, 88.3699, 0.7],  // Howrah - medium
   [22.5646, 88.3531, 0.8],  // New Market
@@ -351,6 +367,152 @@ const damageLevels: DamageLevel = {
   }
 };
 
+// PDF Generation Functions
+const downloadReport = (incident, texts) => {
+  const pdf = new jsPDF();
+  const titleFontSize = 16;
+  const headerFontSize = 12;
+  const textFontSize = 10;
+  
+  // Title
+  pdf.setFontSize(titleFontSize);
+  pdf.text(`${texts.title} - ${incident.location}`, 20, 20);
+  
+  // Date
+  pdf.setFontSize(headerFontSize);
+  pdf.text(`${texts.date || 'Date'}: ${new Date(incident.date).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'})}`, 20, 35);
+  
+  // Damage Level
+
+  pdf.text(`${texts.damageLevel || 'Damage Level'}: ${incident.damageLevel === 'Severe' ? texts.severe : 
+    (incident.damageLevel === 'Moderate' ? texts.moderate : 
+    (incident.damageLevel === 'Minor' ? texts.minor : incident.damageLevel))}`, 20, 45);  // Details section
+  pdf.setFontSize(headerFontSize);
+  pdf.text(`${texts.reportDetails || 'Report Details'}:`, 20, 60);
+  
+  pdf.setFontSize(textFontSize);
+  pdf.text(`${texts.affectedArea}: ${incident.affectedArea}`, 30, 70);
+  pdf.text(`${texts.estimatedLoss}: ${incident.estimatedLoss}`, 30, 80);
+  pdf.text(`${texts.affectedBusinesses}: ${incident.affectedBusinesses}`, 30, 90);
+  pdf.text(`${texts.casualtiesInjuries}: ${incident.casualties} / ${incident.injuries}`, 30, 100);
+  
+  // Footer
+  pdf.setFontSize(textFontSize);
+  pdf.text(`${texts.generatedOn || 'Generated on'}: ${new Date().toLocaleString()}`, 20, 130);
+  
+  // Save PDF
+  pdf.save(`fire-report-${incident.location}-${incident.date}.pdf`);
+};
+
+// For heatmap report
+const downloadHeatmapReport = (texts) => {
+  const pdf = new jsPDF();  
+  // Title
+  pdf.setFontSize(16);
+  pdf.text(texts.heatmapTitle, 20, 20);
+  
+  // Description
+  pdf.setFontSize(10);
+  pdf.text(texts.heatmapDescription, 20, 30, { maxWidth: 170 });
+  
+  // Risk areas section
+  pdf.setFontSize(12);
+  pdf.text(texts.highestRiskAreas, 20, 60);
+  pdf.setFontSize(10);
+  pdf.text(`Burrabazar - ${texts.high}`, 30, 70);
+  pdf.text(`Sealdah - ${texts.high}`, 30, 80);
+  pdf.text(`New Market - ${texts.medium}`, 30, 90);
+  
+  // Improved areas section
+  pdf.setFontSize(12);
+  pdf.text(texts.mostImprovedAreas, 20, 110);
+  pdf.setFontSize(10);
+  pdf.text(`Salt Lake - 28%`, 30, 120);
+  pdf.text(`Howrah - 15%`, 30, 130);
+  pdf.text(`Park Street - 12%`, 30, 140);
+  
+  // Prediction accuracy
+  pdf.setFontSize(12);
+  pdf.text(texts.predictionAccuracy, 20, 160);
+  pdf.setFontSize(10);
+  pdf.text(`94% - ${texts.aiPredictionAccuracy}`, 30, 170);
+  
+  // Save PDF
+  pdf.save(`heatmap-report-${new Date().toISOString().split('T')[0]}.pdf`);
+};
+
+// For insurance report
+const generateInsuranceReport = (texts) => {
+  const pdf = new jsPDF();  
+  // Title
+  pdf.setFontSize(16);
+  pdf.text(texts.insuranceClaimsTitle, 20, 20);
+  
+  // Description
+  pdf.setFontSize(10);
+  pdf.text(texts.insuranceClaimsSubtitle, 20, 30, { maxWidth: 170 });
+  
+  // Claims statistics
+  pdf.setFontSize(12);
+  pdf.text(`${texts.claimsStatistics || 'Claims Statistics'}:`, 20, 50);
+  pdf.setFontSize(10);
+  pdf.text(`${texts.claimsFiled}: 128`, 30, 60);
+  pdf.text(`${texts.inProcessing}: 43`, 30, 70);
+  pdf.text(`${texts.approved}: 72`, 30, 80);
+  pdf.text(`${texts.rejected}: 13`, 30, 90);
+  
+  // Additional info
+  pdf.text(`${texts.averageClaimValue}: ₹28.6 Lakhs`, 30, 110);
+  pdf.text(`${texts.averageProcessingTime}: 14.2 ${texts.days}`, 30, 120);
+  
+  // Footer
+  pdf.setFontSize(10);
+  pdf.text(`${texts.generatedOn || 'Generated on'}: ${new Date().toLocaleString()}`, 20, 180);
+  
+  // Save PDF
+  pdf.save(`insurance-report-${new Date().toISOString().split('T')[0]}.pdf`);
+};
+
+// For complete analytics export
+const exportCompleteAnalytics = (texts) => {
+  const pdf = new jsPDF();
+
+  // Title
+  pdf.setFontSize(16);
+  pdf.text(texts.annualComparisonTitle, 20, 20);
+  
+  // Year over year changes
+  pdf.setFontSize(12);
+  pdf.text(`${texts.yearOverYearChange}:`, 20, 40);
+  pdf.setFontSize(10);
+  pdf.text(`+12% ${texts.increaseInIncidents}`, 30, 50);
+  
+  // Response time
+  pdf.setFontSize(12);
+  pdf.text(`${texts.averageResponseTime}:`, 20, 70);
+  pdf.setFontSize(10);
+  pdf.text(`8.4 min (-12% ${texts.fasterThanPreviousYear})`, 30, 80);
+  
+  // Casualties
+  pdf.setFontSize(12);
+  pdf.text(`${texts.civilianCasualties}:`, 20, 100);
+  pdf.setFontSize(10);
+  pdf.text(`-20% ${texts.reductionFromLastYear}`, 30, 110);
+  
+  // Damage assessment
+  pdf.setFontSize(12);
+  pdf.text(`${texts.damageAssessmentTitle}:`, 20, 130);
+  pdf.setFontSize(10);
+  pdf.text(`${texts.totalEstimatedLoss} ₹12.4 Crore`, 30, 140);
+  pdf.text('Property: ₹3.2 Crore', 30, 150);
+  pdf.text('Inventory: ₹2.8 Crore', 30, 160);
+  pdf.text('Business Disruption: ₹4.5 Crore', 30, 170);
+  pdf.text('Infrastructure: ₹1.9 Crore', 30, 180);
+  
+  // Save PDF
+  pdf.save(`fire-analytics-${new Date().toISOString().split('T')[0]}.pdf`);
+};
+
 // Heatmap Layer Component
 const HeatmapLayer = ({ points }: { points: Array<[number, number, number]> }) => {
   const map = useMap();
@@ -358,7 +520,7 @@ const HeatmapLayer = ({ points }: { points: Array<[number, number, number]> }) =
   useEffect(() => {
     if (!map) return;
 
-    // @ts-ignore - Leaflet.heat doesn't have proper TypeScript definitions
+    // @ts-expect-error - Leaflet.heat doesn't have proper TypeScript definitions
     const heatLayer = L.heatLayer(points, {
       radius: 25,
       blur: 15,
@@ -369,424 +531,480 @@ const HeatmapLayer = ({ points }: { points: Array<[number, number, number]> }) =
         0.6: 'cyan', 
         0.7: 'lime', 
         0.8: 'yellow', 
+        0.9: 'orange', 
         1.0: 'red' 
       }
     }).addTo(map);
-
+    
     return () => {
       map.removeLayer(heatLayer);
     };
   }, [map, points]);
-
+  
   return null;
 };
 
-// Custom fire icon
-const fireIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
-// Mock function for report download
-const downloadReport = (reportUrl: string, location: string) => {
-  alert(`Downloading report for ${location}...`);
-  console.log(`Download URL: ${reportUrl}`);
-};
-
-const PostFireAnalysis = () => {
-  const [selectedLocation, setSelectedLocation] = useState<string>("all");
-  const [selectedTimeframe, setSelectedTimeframe] = useState<string>("3months");
-  const [searchQuery, setSearchQuery] = useState<string>("");
+// Main application component
+export default function FireAnalysisDashboard() {
+  const [language, setLanguage] = useState("en");
+  const [selectedLocation, setSelectedLocation] = useState("all");
+  const [timeframe, setTimeframe] = useState("last3Months");
+  const [mapCenter, setMapCenter] = useState<[number, number]>([22.5726, 88.3639]);
+  const [mapZoom, setMapZoom] = useState(12);
+  const [searchQuery, setSearchQuery] = useState("");
   const [filteredIncidents, setFilteredIncidents] = useState(fireIncidents);
-  const [currentLanguage, setCurrentLanguage] = useState<"en" | "hi" | "bn">("en");
   
-  // Texts based on the selected language
-  const texts = translations[currentLanguage];
-
-  // Filter incidents based on search and filters
+  // Get current language texts
+  const texts = translations[language as keyof typeof translations];
+  
+  // Filter incidents based on search query, location, and timeframe
   useEffect(() => {
-    let results = [...fireIncidents];
+    let filtered = [...fireIncidents];
     
+    // Apply search filter
     if (searchQuery) {
-      results = results.filter(incident => 
+      filtered = filtered.filter(incident => 
         incident.location.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
     
+    // Apply location filter
     if (selectedLocation !== "all") {
-      results = results.filter(incident => 
-        incident.location === selectedLocation
-      );
+      filtered = filtered.filter(incident => incident.location === selectedLocation);
     }
     
-    setFilteredIncidents(results);
-  }, [searchQuery, selectedLocation, selectedTimeframe]);
-
+    // Apply timeframe filter
+    const now = new Date();
+    let cutoffDate = new Date();
+    
+    switch(timeframe) {
+      case "last3Months":
+        cutoffDate.setMonth(now.getMonth() - 3);
+        break;
+      case "last6Months":
+        cutoffDate.setMonth(now.getMonth() - 6);
+        break;
+      case "lastYear":
+        cutoffDate.setFullYear(now.getFullYear() - 1);
+        break;
+      case "allTime":
+      default:
+        cutoffDate = new Date(0); // Beginning of time
+    }
+    
+    filtered = filtered.filter(incident => new Date(incident.date) >= cutoffDate);
+    
+    setFilteredIncidents(filtered);
+  }, [searchQuery, selectedLocation, timeframe]);
+  
+  // Handler for detailed report download
+  const handleDownloadReport = (incident) => {
+    console.log("Downloading report for incident:", incident);
+    downloadReport(incident, texts);
+  };
+  
+  // Handler for heatmap report download
+  const handleDownloadHeatmapReport = () => {
+    downloadHeatmapReport(texts);
+  };
+  
+  // Handler for insurance report generation
+  const handleGenerateInsuranceReport = () => {
+    generateInsuranceReport(texts);
+  };
+  
+  // Handler for analytics export
+  const handleExportAnalytics = () => {
+    exportCompleteAnalytics(texts);
+  };
+  
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 py-16 px-4 md:px-6">
-      <div className="container mx-auto">
-        {/* Language selector */}
-        <div className="flex justify-end mb-6">
-          <Select value={currentLanguage} onValueChange={(value) => setCurrentLanguage(value as "en" | "hi" | "bn")}>
-            <SelectTrigger className="w-40 bg-black/60 border-fire/30 text-white">
-              <div className="flex items-center gap-2">
-                <Globe size={16} />
-                <SelectValue placeholder={texts.language} />
-              </div>
+    <div className="container mx-auto p-4">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold">{texts.title}</h1>
+          <p className="text-gray-500">{texts.subtitle}</p>
+        </div>
+        <div className="flex gap-2 items-center">
+          <Select value={language} onValueChange={setLanguage}>
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder={texts.language} />
             </SelectTrigger>
-            <SelectContent className="bg-black/95 border-fire/30 text-white">
+            <SelectContent>
               <SelectItem value="en">English</SelectItem>
-              <SelectItem value="hi">हिंदी (Hindi)</SelectItem>
-              <SelectItem value="bn">বাংলা (Bengali)</SelectItem>
+              <SelectItem value="hi">हिन्दी</SelectItem>
+              <SelectItem value="bn">বাংলা</SelectItem>
             </SelectContent>
           </Select>
+          <Button variant="outline" size="sm">
+            <HelpCircle className="h-4 w-4 mr-2" />
+            {texts.howToUse}
+          </Button>
         </div>
-
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4 text-white drop-shadow-md">
-            {texts.title}
-          </h1>
-          <p className="text-white/80 text-lg mb-6">
-            {texts.subtitle}
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-            <Button className="bg-fire hover:bg-fire/80 text-white flex items-center gap-2">
-              <BarChart2 size={18} />
-              {texts.latestAnalysisReport}
-            </Button>
-            <Button variant="outline" className="border-fire text-fire hover:bg-fire/10 flex items-center gap-2">
-              <HelpCircle size={18} />
-              {texts.howToUse}
-            </Button>
-          </div>
-        </div>
-
-        <Tabs defaultValue="reports" className="w-full">
-          <TabsList className="grid grid-cols-3 max-w-md mx-auto bg-black/50">
-            <TabsTrigger value="reports" className="text-white data-[state=active]:bg-fire data-[state=active]:text-white">
-              {texts.reports}
-            </TabsTrigger>
-            <TabsTrigger value="heatmap" className="text-white data-[state=active]:bg-fire data-[state=active]:text-white">
-              {texts.heatmap}
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="text-white data-[state=active]:bg-fire data-[state=active]:text-white">
-              {texts.analytics}
-            </TabsTrigger>
-          </TabsList>
-
-          {/* REPORTS TAB */}
-          <TabsContent value="reports" className="mt-8">
-            <div className="bg-black/40 backdrop-blur-sm border border-fire/20 p-6 rounded-lg mb-8">
-              <div className="flex flex-col md:flex-row gap-4 justify-between">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                    <Input 
-                      placeholder={texts.searchByLocation}
-                      className="pl-10 bg-black/60 border-fire/30 text-white"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                    <SelectTrigger className="w-full sm:w-40 bg-black/60 border-fire/30 text-white">
-                      <SelectValue placeholder={texts.location} />
-                    </SelectTrigger>
-                    <SelectContent className="bg-black/95 border-fire/30 text-white">
-                      <SelectItem value="all">{texts.allLocations}</SelectItem>
-                      <SelectItem value="Burrabazar Market">Burrabazar</SelectItem>
-                      <SelectItem value="Howrah Industrial Estate">Howrah</SelectItem>
-                      <SelectItem value="Salt Lake Sector V">Salt Lake</SelectItem>
-                      <SelectItem value="Sealdah Station Area">Sealdah</SelectItem>
-                      <SelectItem value="New Market Area">New Market</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  <Select value={selectedTimeframe} onValueChange={setSelectedTimeframe}>
-                    <SelectTrigger className="w-full sm:w-40 bg-black/60 border-fire/30 text-white">
-                      <SelectValue placeholder={texts.timeframe} />
-                    </SelectTrigger>
-                    <SelectContent className="bg-black/95 border-fire/30 text-white">
-                      <SelectItem value="3months">{texts.last3Months}</SelectItem>
-                      <SelectItem value="6months">{texts.last6Months}</SelectItem>
-                      <SelectItem value="1year">{texts.lastYear}</SelectItem>
-                      <SelectItem value="all">{texts.allTime}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+      </div>
+      
+      <Tabs defaultValue="reports" className="mb-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="reports">
+            <FileText className="h-4 w-4 mr-2" />
+            {texts.reports}
+          </TabsTrigger>
+          <TabsTrigger value="heatmap">
+            <MapPin className="h-4 w-4 mr-2" />
+            {texts.heatmap}
+          </TabsTrigger>
+          <TabsTrigger value="analytics">
+            <BarChart2 className="h-4 w-4 mr-2" />
+            {texts.analytics}
+          </TabsTrigger>
+        </TabsList>
+        
+        {/* Reports Tab */}
+        <TabsContent value="reports" className="space-y-4">
+          <div className="flex gap-4 mb-4">
+            <div className="grow">
+              <div className="relative">
+                <Search className="absolute left-2 top-3 h-4 w-4 text-gray-500" />
+                <Input 
+                  placeholder={texts.searchByLocation} 
+                  className="pl-8" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
             </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {filteredIncidents.map((incident) => (
-                <Card 
-                  key={incident.id} 
-                  className="bg-black/80 backdrop-blur-sm border border-fire/30 hover:border-fire/50 transition-all duration-300"
-                >
-                  <CardHeader>
+            <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder={texts.location} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{texts.allLocations}</SelectItem>
+                {fireIncidents.map(incident => (
+                  <SelectItem key={incident.id} value={incident.location}>
+                    {incident.location}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={timeframe} onValueChange={setTimeframe}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder={texts.timeframe} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="last3Months">{texts.last3Months}</SelectItem>
+                <SelectItem value="last6Months">{texts.last6Months}</SelectItem>
+                <SelectItem value="lastYear">{texts.lastYear}</SelectItem>
+                <SelectItem value="allTime">{texts.allTime}</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button size="icon" variant="outline">
+              <Filter className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          {filteredIncidents.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredIncidents.map(incident => (
+                <Card key={incident.id} className="overflow-hidden">
+                  <CardHeader className={`${damageLevels[incident.damageLevel].color}`}>
                     <div className="flex justify-between items-start">
                       <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <MapPin className="h-5 w-5 text-fire" />
-                          <CardTitle className="text-xl text-white">{incident.location}</CardTitle>
-                        </div>
-                        <div className="flex items-center gap-2 text-gray-400 text-sm">
+                        <CardTitle>{incident.location}</CardTitle>
+                        <CardDescription className="flex items-center gap-1 mt-1">
                           <Calendar className="h-4 w-4" />
-                          <span>{new Date(incident.date).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'})}</span>
-                        </div>
+                          {new Date(incident.date).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'})}
+                        </CardDescription>
                       </div>
-                      <div className={`px-3 py-1 rounded-full ${damageLevels[incident.damageLevel].color} ${damageLevels[incident.damageLevel].textColor} text-sm font-medium`}>
-                        {texts[incident.damageLevel.toLowerCase() as keyof typeof texts]}
+                      <div className={`px-2 py-1 rounded-md text-xs font-medium ${damageLevels[incident.damageLevel].color} ${damageLevels[incident.damageLevel].textColor}`}>
+                        {texts[incident.damageLevel.toLowerCase()] || incident.damageLevel}
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-white/80">
+                  <CardContent className="pt-4">
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-sm text-gray-400">{texts.affectedArea}</p>
+                        <p className="text-sm text-gray-500">{texts.affectedArea}</p>
                         <p className="font-medium">{incident.affectedArea}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-400">{texts.estimatedLoss}</p> 
+                        <p className="text-sm text-gray-500">{texts.estimatedLoss}</p>
                         <p className="font-medium">{incident.estimatedLoss}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-400">{texts.affectedBusinesses}</p>
+                        <p className="text-sm text-gray-500">{texts.affectedBusinesses}</p>
                         <p className="font-medium">{incident.affectedBusinesses}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-400">{texts.casualtiesInjuries}</p>
+                        <p className="text-sm text-gray-500">{texts.casualtiesInjuries}</p>
                         <p className="font-medium">{incident.casualties} / {incident.injuries}</p>
                       </div>
                     </div>
                   </CardContent>
-                  <CardFooter>
+                  <CardFooter className="border-t bg-black py-2">
                     <Button 
-                      onClick={() => downloadReport(incident.reportUrl, incident.location)}
-                      className="w-full bg-fire hover:bg-fire/80 text-white flex items-center justify-center gap-2"
+                      variant="ghost" 
+                      size="sm" 
+                      className="w-full flex gap-2"
+                      onClick={() => handleDownloadReport(incident)}
                     >
-                      <Download size={18} />
+                      <Download className="h-4 w-4" />
                       {texts.downloadDetailedReport}
                     </Button>
                   </CardFooter>
                 </Card>
               ))}
             </div>
-
-            {filteredIncidents.length === 0 && (
-              <div className="text-center py-12 bg-black/40 backdrop-blur-sm border border-fire/20 rounded-lg mt-4">
-                <FileText className="h-12 w-12 mx-auto text-fire/50 mb-4" />
-                <h3 className="text-xl font-medium text-white mb-2">{texts.noReportsFound}</h3>
-                <p className="text-gray-400">{texts.tryAdjusting}</p>
-              </div>
-            )}
-          </TabsContent>
-
-          {/* HEATMAP TAB */}
-          <TabsContent value="heatmap" className="mt-8">
-            <Card className="bg-black/80 backdrop-blur-sm border border-fire/30">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-2xl text-white">{texts.heatmapTitle}</CardTitle>
-                    <CardDescription className="text-gray-400 mt-1">{texts.heatmapSubtitle}</CardDescription>
-                  </div>
-                  <div className="flex gap-3">
-                    <Select defaultValue="2025">
-                      <SelectTrigger className="w-24 bg-black/60 border-fire/30 text-white">
-                        <SelectValue placeholder={texts.year} />
-                      </SelectTrigger>
-                      <SelectContent className="bg-black/95 border-fire/30 text-white">
-                        <SelectItem value="2025">2025</SelectItem>
-                        <SelectItem value="2024">2024</SelectItem>
-                        <SelectItem value="2023">2023</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Button variant="outline" className="border-fire text-fire hover:bg-fire/10 flex items-center gap-2">
-                      <Filter size={16} />
-                      {texts.filters}
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-8">
-                  <div className="relative bg-black/50 border border-fire/20 rounded-lg p-4 h-[500px]">
-                    <MapContainer 
-                      center={[22.5726, 88.3639]} 
-                      zoom={13} 
-                      style={{ height: '100%', width: '100%' }}
-                      className="z-0 rounded-md"
-                    >
-                      <TileLayer
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                      />
-                      
-                      <HeatmapLayer points={heatmapPoints} />
-                      
-                      {fireIncidents.map(incident => (
-                        <Marker
-                          key={incident.id}
-                          position={[incident.lat, incident.lng]}
-                          icon={fireIcon}
-                        >
-                          <Popup>
-                            <div className="space-y-1">
-                              <h3 className="font-bold">{incident.location}</h3>
-                              <p>Severity: {incident.damageLevel}</p>
-                              <p>Date: {incident.date}</p>
-                              <p>Loss: {incident.estimatedLoss}</p>
-                            </div>
-                          </Popup>
-                        </Marker>
-                      ))}
-                    </MapContainer>
-                  </div>
-                  <p className="text-sm text-gray-400 mt-3">{texts.heatmapDescription}</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                  <div className="bg-black/50 border border-fire/20 rounded-lg p-4">
-                    <h3 className="text-lg font-medium text-white mb-3">{texts.highestRiskAreas}</h3>
-                    <ul className="space-y-2 text-gray-300">
-                      <li className="flex justify-between"><span>Burrabazar</span> <span className="text-red-500">{texts.high}</span></li>
-                      <li className="flex justify-between"><span>Sealdah</span> <span className="text-red-500">{texts.high}</span></li>
-                      <li className="flex justify-between"><span>New Market</span> <span className="text-amber-500">{texts.medium}</span></li>
-                    </ul>
-                  </div>
-                  <div className="bg-black/50 border border-fire/20 rounded-lg p-4">
-                    <h3 className="text-lg font-medium text-white mb-3">{texts.mostImprovedAreas}</h3>
-                    <ul className="space-y-2 text-gray-300">
-                      <li className="flex justify-between"><span>Salt Lake</span> <span className="text-green-500">28%</span></li>
-                      <li className="flex justify-between"><span>Howrah</span> <span className="text-green-500">15%</span></li>
-                      <li className="flex justify-between"><span>Park Street</span> <span className="text-green-500">12%</span></li>
-                    </ul>
-                  </div>
-                  <div className="bg-black/50 border border-fire/20 rounded-lg p-4">
-                    <h3 className="text-lg font-medium text-white mb-3">{texts.predictionAccuracy}</h3>
-                    <div className="flex flex-col items-center">
-                      <div className="text-4xl font-bold text-fire mb-2">94%</div>
-                      <p className="text-gray-400 text-sm">{texts.aiPredictionAccuracy}</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button className="w-full bg-fire hover:bg-fire/80 text-white flex items-center justify-center gap-2">
-                  <Download size={18} />
-                  {texts.downloadFullHeatmapReport}
-                </Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-          {/* ANALYTICS TAB */}
-          <TabsContent value="analytics" className="mt-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              <Card className="bg-black/80 backdrop-blur-sm border border-fire/30">
-                <CardHeader>
-                  <CardTitle className="text-xl text-white">{texts.damageAssessmentTitle}</CardTitle>
-                  <CardDescription className="text-gray-400">{texts.damageAssessmentSubtitle}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-72 flex items-center justify-center">
-                    {/* Placeholder for pie chart */}
-                    <PieChart className="h-64 w-64 text-fire/50" />
-                  </div>
-                  <div className="text-center mt-4">
-                    <div className="text-sm text-gray-400">{texts.totalEstimatedLoss}</div>
-                    <div className="text-2xl font-bold text-white">₹12.4 Crore</div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-black/80 backdrop-blur-sm border border-fire/30">
-                <CardHeader>
-                  <CardTitle className="text-xl text-white">{texts.insuranceClaimsTitle}</CardTitle>
-                  <CardDescription className="text-gray-400">{texts.insuranceClaimsSubtitle}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <div className="bg-black/50 p-3 rounded-lg text-center">
-                      <div className="text-2xl font-bold text-white">128</div>
-                      <div className="text-sm text-gray-400">{texts.claimsFiled}</div>
-                    </div>
-                    <div className="bg-black/50 p-3 rounded-lg text-center">
-                      <div className="text-2xl font-bold text-white">43</div>
-                      <div className="text-sm text-gray-400">{texts.inProcessing}</div>
-                    </div>
-                    <div className="bg-black/50 p-3 rounded-lg text-center">
-                      <div className="text-2xl font-bold text-white">72</div>
-                      <div className="text-sm text-gray-400">{texts.approved}</div>
-                    </div>
-                    <div className="bg-black/50 p-3 rounded-lg text-center">
-                      <div className="text-2xl font-bold text-white">13</div>
-                      <div className="text-sm text-gray-400">{texts.rejected}</div>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-black/50 p-4 rounded-lg">
-                      <div className="text-sm text-gray-400 mb-1">{texts.averageClaimValue}</div>
-                      <div className="text-xl font-bold text-white">₹28.6 Lakhs</div>
-                    </div>
-                    <div className="bg-black/50 p-4 rounded-lg">
-                      <div className="text-sm text-gray-400 mb-1">{texts.averageProcessingTime}</div>
-                      <div className="text-xl font-bold text-white">14.2 {texts.days}</div>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button className="w-full bg-fire hover:bg-fire/80 text-white">
-                    {texts.generateInsuranceReport}
-                  </Button>
-                </CardFooter>
-              </Card>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <FileText className="h-12 w-12 text-gray-300 mb-4" />
+              <h3 className="text-lg font-medium">{texts.noReportsFound}</h3>
+              <p className="text-gray-500">{texts.tryAdjusting}</p>
             </div>
-
-            <Card className="bg-black/80 backdrop-blur-sm border border-fire/30">
+          )}
+        </TabsContent>
+        
+        {/* Heatmap Tab */}
+        <TabsContent value="heatmap" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>{texts.heatmapTitle}</CardTitle>
+              <CardDescription>{texts.heatmapSubtitle}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-4 mb-4">
+                <Select defaultValue="2025">
+                  <SelectTrigger className="w-[120px]">
+                    <SelectValue placeholder={texts.year} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="2025">2025</SelectItem>
+                    <SelectItem value="2024">2024</SelectItem>
+                    <SelectItem value="2023">2023</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button size="sm" variant="outline">
+                  <Filter className="h-4 w-4 mr-2" />
+                  {texts.filters}
+                </Button>
+              </div>
+              
+              <div className="border rounded-md h-[400px] overflow-hidden">
+                <div className="h-full w-full">
+                  <MapContainer 
+                    center={mapCenter} 
+                    zoom={mapZoom} 
+                    style={{ height: '100%', width: '100%' }}
+                  >
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    />
+                    <HeatmapLayer points={heatmapPoints} />
+                    {fireIncidents.map(incident => (
+                      <Marker
+                        key={incident.id}
+                        position={[incident.lat, incident.lng]}
+                      >
+                        <Popup>
+                          <div className="p-2">
+                            <h3 className="font-medium">{incident.location}</h3>
+                            <p className="text-sm">{texts.date}: {new Date(incident.date).toLocaleDateString()}</p>
+                            <p className="text-sm">
+                              {texts.damageLevel}: {texts[incident.damageLevel.toLowerCase()] || incident.damageLevel}
+                            </p>
+                          </div>
+                        </Popup>
+                      </Marker>
+                    ))}
+                  </MapContainer>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm">{texts.highestRiskAreas}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex justify-between">
+                        <span>Burrabazar</span>
+                        <span className="font-medium text-red-500">High</span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span>Sealdah</span>
+                        <span className="font-medium text-red-500">High</span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span>New Market</span>
+                        <span className="font-medium text-amber-500">Medium</span>
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm">{texts.mostImprovedAreas}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex justify-between">
+                        <span>Salt Lake</span>
+                        <span className="font-medium text-green-500">-28%</span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span>Howrah</span>
+                        <span className="font-medium text-green-500">-15%</span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span>Park Street</span>
+                        <span className="font-medium text-green-500">-12%</span>
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm">{texts.predictionAccuracy}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center">
+                      <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                        <span className="text-blue-700 font-bold">94%</span>
+                      </div>
+                      <div className="text-sm">
+                        <p>{texts.aiPredictionAccuracy}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+            <CardFooter className="border-t bg-black py-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="w-full flex gap-2"
+                onClick={handleDownloadHeatmapReport}
+              >
+                <Download className="h-4 w-4" />
+                {texts.downloadFullHeatmapReport}
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+        
+        {/* Analytics Tab */}
+        <TabsContent value="analytics" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
               <CardHeader>
-                <CardTitle className="text-xl text-white">{texts.annualComparisonTitle}</CardTitle>
+                <CardTitle>{texts.damageAssessmentTitle}</CardTitle>
+                <CardDescription>{texts.damageAssessmentSubtitle}</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-80 relative mb-6">
-                  {/* Placeholder for bar chart */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <BarChart2 className="h-64 w-64 text-fire/50" />
+                {/* We would render a chart here - using a placeholder div */}
+                <div className="bg-red-950 rounded-md p-4 h-64 flex items-center justify-center">
+                  <PieChart className="h-12 w-12 text-gray-400" />
+                </div>
+                <div className="mt-4">
+                  <p className="font-medium">{texts.totalEstimatedLoss}</p>
+                  <h3 className="text-2xl font-bold">₹12.4 Crore</h3>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>{texts.insuranceClaimsTitle}</CardTitle>
+                <CardDescription>{texts.insuranceClaimsSubtitle}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="bg-black p-3 rounded-md">
+                    <p className="text-xs text-blue-600">{texts.claimsFiled}</p>
+                    <h4 className="text-2xl font-bold">128</h4>
+                  </div>
+                  <div className="bg-red-950 p-3 rounded-md">
+                    <p className="text-xs text-amber-600">{texts.inProcessing}</p>
+                    <h4 className="text-2xl font-bold">43</h4>
+                  </div>
+                  <div className="bg-red-950 p-3 rounded-md">
+                    <p className="text-xs text-green-600">{texts.approved}</p>
+                    <h4 className="text-2xl font-bold">72</h4>
+                  </div>
+                  <div className="bg-black p-3 rounded-md">
+                    <p className="text-xs text-red-600">{texts.rejected}</p>
+                    <h4 className="text-2xl font-bold">13</h4>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-black/50 p-4 rounded-lg">
-                    <div className="text-sm text-gray-400 mb-1">{texts.yearOverYearChange}</div>
-                    <div className="text-xl font-bold text-red-500">+12% {texts.increaseInIncidents}</div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">{texts.averageClaimValue}</span>
+                    <span className="font-medium">₹28.6 Lakhs</span>
                   </div>
-                  <div className="bg-black/50 p-4 rounded-lg">
-                    <div className="text-sm text-gray-400 mb-1">{texts.averageResponseTime}</div>
-                    <div className="text-xl font-bold text-green-500">8.4 min (-12% {texts.fasterThanPreviousYear})</div>
-                  </div>
-                  <div className="bg-black/50 p-4 rounded-lg">
-                    <div className="text-sm text-gray-400 mb-1">{texts.civilianCasualties}</div>
-                    <div className="text-xl font-bold text-green-500">-20% {texts.reductionFromLastYear}</div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">{texts.averageProcessingTime}</span>
+                    <span className="font-medium">14.2 {texts.days}</span>
                   </div>
                 </div>
               </CardContent>
-              <CardFooter>
-                <Button className="w-full bg-fire hover:bg-fire/80 text-white flex items-center justify-center gap-2">
-                  <Download size={18} />
-                  {texts.exportCompleteAnalytics}
+              <CardFooter className="border-t bg-red-950 py-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full flex gap-2"
+                  onClick={handleGenerateInsuranceReport}
+                >
+                  <Download className="h-4 w-4" />
+                  {texts.generateInsuranceReport}
                 </Button>
               </CardFooter>
             </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
+          </div>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>{texts.annualComparisonTitle}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {/* We would render a chart here - using a placeholder div */}
+              <div className="bg-red-950 rounded-md p-4 h-64 flex items-center justify-center">
+                <BarChart2 className="h-12 w-12 text-gray-400" />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div className="border p-3 rounded-md">
+                  <p className="text-xs text-gray-500">{texts.yearOverYearChange}</p>
+                  <h4 className="text-xl font-bold text-red-500">+12%</h4>
+                  <p className="text-xs text-gray-500">{texts.increaseInIncidents}</p>
+                </div>
+                <div className="border p-3 rounded-md">
+                  <p className="text-xs text-gray-500">{texts.averageResponseTime}</p>
+                  <h4 className="text-xl font-bold text-green-500">8.4 min</h4>
+                  <p className="text-xs text-gray-500">-12% {texts.fasterThanPreviousYear}</p>
+                </div>
+                <div className="border p-3 rounded-md">
+                  <p className="text-xs text-gray-500">{texts.civilianCasualties}</p>
+                  <h4 className="text-xl font-bold text-green-500">-20%</h4>
+                  <p className="text-xs text-gray-500">{texts.reductionFromLastYear}</p>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="border-t border-red-800 py-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="w-full flex gap-2"
+                onClick={handleExportAnalytics}
+              >
+                <Download className="h-4 w-4" />
+                {texts.exportCompleteAnalytics}
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
-};
-
-export default PostFireAnalysis;
+}
