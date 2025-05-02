@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 interface Message {
@@ -16,9 +17,9 @@ const Chatbot: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  //   useEffect(() => {
-  //     scrollToBottom();
-  //   }, [messages]);
+    useEffect(() => {
+      scrollToBottom();
+    }, [messages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
