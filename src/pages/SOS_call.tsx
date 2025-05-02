@@ -47,7 +47,7 @@ import {
 import { error } from "console";
 
 // Types
-interface EmergencyContact {
+export interface EmergencyContact {
   id: string;
   name: string;
   phone: string;
