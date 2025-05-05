@@ -95,10 +95,10 @@ const NotificationsPopover = ({
 // Main Component
 const Navbar = () => {
   const [notifications, setNotifications] = useState([
-    { id: 1, message: "Fire alert in Sector 7", time: "Just now", read: false },
+    
     {
       id: 2,
-      message: "High risk zone detected near your location",
+      message: "High risk zone detected near RCCIIT , Beleghata",
       time: "5 min ago",
       read: false,
     },
