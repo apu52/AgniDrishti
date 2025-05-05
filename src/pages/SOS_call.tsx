@@ -244,14 +244,16 @@ const SOSPanicButton = () => {
         );
         setSosActivated(false);
       }
-    } catch (error) {
-      console.log(error);
+    } 
 
-      alert("Failed to send SMS");
-      setSosActivated(false);
-    } finally {
-      setSosActivated(false);
-    }
+// catch (error) {
+//       console.log(error);
+
+//       alert("Failed to send SMS");
+//       setSosActivated(false);
+//     } finally {
+//       setSosActivated(false);
+//     }
   };
 
   // Handle adding a new contact
