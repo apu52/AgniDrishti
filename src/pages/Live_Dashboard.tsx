@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { MapPin, AlertTriangle, Users, Clock, ThermometerSun, Flag, Info } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress"; // Import Progress for loading
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,6 +18,12 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from 'recharts';
+// --- Firebase Imports ---
+import { database } from "@/firebase-config"; // Adjust path if needed
+import { ref, onValue, off } from "firebase/database";
+// --- End Firebase Imports ---
+
+import $ from 'jquery';
 
 
 // Type definitions
@@ -57,10 +64,10 @@ const fireIcon = (severity: FireSeverity) => {
     low: 'blue',
     controlled: 'green'
   };
-  
+
   return new L.Icon({
-    iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${iconColor[severity]}.png`,
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
@@ -94,97 +101,6 @@ const fireTrendData = [
   { month: "Nov", incidents: 35 },
   { month: "Dec", incidents: 38 },
 ];
-const sampleFireIncidents: FireIncident[] = [
-  {
-    incidentId: "fire-001",
-    location: {
-      lat: 22.5726,
-      lng: 88.3639,
-      address: "27B, Raja Rammohan Roy Sarani, Burrabazar",
-      area: "Burrabazar"
-    },
-    severity: "critical",
-    reportTime: "2025-04-29T08:15:00",
-    source: "sensor",
-    status: "active",
-    temperature: 390,
-    details: "Commercial building fire spreading to adjacent structures",
-    evacuationStatus: "In progress",
-    respondingUnits: ["Engine 7", "Ladder 3", "Battalion 2"],
-    verifiedReports: 8
-  },
-  {
-    incidentId: "fire-002",
-    location: {
-      lat: 22.5958,
-      lng: 88.3699,
-      address: "12, Strand Road, Burrabazar",
-      area: "Burrabazar"
-    },
-    severity: "high",
-    reportTime: "2025-04-29T08:30:00",
-    source: "crowdsourced",
-    status: "responding",
-    reportedBy: "Local Business Owner",
-    details: "Smoke coming from a warehouse",
-    evacuationStatus: "Not started",
-    respondingUnits: ["Engine 5"],
-    verifiedReports: 3
-  },
-  {
-    incidentId: "fire-003",
-    location: {
-      lat: 22.6139,
-      lng: 88.3879,
-      address: "45, Circular Garden Reach Road, Howrah",
-      area: "Howrah"
-    },
-    severity: "medium",
-    reportTime: "2025-04-29T07:45:00",
-    source: "emergency-services",
-    status: "contained",
-    details: "Small industrial fire",
-    evacuationStatus: "Complete",
-    respondingUnits: ["Engine 3", "Ladder 1"],
-    verifiedReports: 7
-  },
-  {
-    incidentId: "fire-004",
-    location: {
-      lat: 22.5646,
-      lng: 88.3531,
-      address: "78, Lindsay Street, New Market",
-      area: "New Market"
-    },
-    severity: "high",
-    reportTime: "2025-04-29T09:10:00",
-    source: "sensor",
-    status: "active",
-    temperature: 350,
-    details: "Market fire affecting multiple shops",
-    evacuationStatus: "In progress",
-    respondingUnits: ["Engine 2", "Engine 8", "Battalion 1"],
-    verifiedReports: 12
-  },
-  {
-    incidentId: "fire-005",
-    location: {
-      lat: 22.5033,
-      lng: 88.3454,
-      address: "23, Diamond Harbour Road, Behala",
-      area: "Behala"
-    },
-    severity: "low",
-    reportTime: "2025-04-29T06:30:00",
-    source: "crowdsourced",
-    status: "contained",
-    reportedBy: "Local Resident",
-    details: "Small fire in abandoned building",
-    evacuationStatus: "Complete",
-    respondingUnits: ["Engine 9"],
-    verifiedReports: 2
-  }
-];
 
 // Helper functions
 const getSeverityColor = (severity: FireSeverity): string => {
@@ -213,38 +129,120 @@ const getSourceIcon = (source: string) => {
 
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ", " + 
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ", " +
          date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
 };
 
 // Main component
 const LiveFireDashboard = () => {
   const [selectedArea, setSelectedArea] = useState<string>("all");
-  const [filteredIncidents, setFilteredIncidents] = useState<FireIncident[]>(sampleFireIncidents);
+  const [allIncidents, setAllIncidents] = useState<FireIncident[]>([]); // State for all fetched incidents
+  const [filteredIncidents, setFilteredIncidents] = useState<FireIncident[]>([]); // State for displayed incidents
   const [selectedIncident, setSelectedIncident] = useState<FireIncident | null>(null);
   const [activeIncidentsCount, setActiveIncidentsCount] = useState<number>(0);
   const [currentTab, setCurrentTab] = useState<string>("map");
+  const [isLoading, setIsLoading] = useState<boolean>(true); // Loading state
+  const [error, setError] = useState<string | null>(null); // Error state
+
+  // --- Firebase Realtime Listener ---
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+    // Define the path in your Firebase Realtime Database where the incident data is stored.
+    // Adjust '/hardware-data' to your actual path.
+    const incidentsRef = ref(database, '/');
+
+    const unsubscribe = onValue(incidentsRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const rawData = snapshot.val();
+        // --- Data Transformation ---
+        // This part is crucial and depends heavily on your Firebase data structure.
+        // You need to map the rawData object into an array of FireIncident objects.
+        // Example transformation (assuming rawData is an object where keys are incident IDs):
+        const transformedIncidents: FireIncident[] = Object.entries(rawData).map(([key, value]: [string, Partial<FireIncident>]) => {
+          // Basic mapping - *ADJUST THIS LOGIC BASED ON YOUR ACTUAL FIREBASE DATA*
+          return {
+            incidentId: key,
+            location: {
+              lat: value.location?.lat || 22.5581, // Default or fallback
+              lng: value.location?.lng || 88.3961, // Default or fallback
+              address: value.location?.address || "Beleghata",
+              area: value.location?.area || "RCCIIT",
+            },
+            // Determine severity based on data (e.g., temperature)
+            severity: determineSeverity(value.temperature),
+            reportTime: (value as { timestamp?: string })?.timestamp || new Date().toISOString(),
+            source: value.source || "sensor", // Assuming sensor data
+            // Determine status based on data
+            status: determineStatus(value.status),
+            temperature: value.temperature,
+            details: value.details || "No details available.",
+            evacuationStatus: value.evacuationStatus || "Unknown",
+            respondingUnits: value.respondingUnits || [],
+            verifiedReports: value.verifiedReports || 0, // If you store this
+            // Add other fields as needed
+          };
+        });
+        // --- End Data Transformation ---
+
+        setAllIncidents(transformedIncidents);
+        setError(null);
+      } else {
+        console.log("No data available at the specified path.");
+        setAllIncidents([]); // Clear incidents if no data
+      }
+      setIsLoading(false);
+    }, (error) => {
+      console.error("Firebase read failed:", error);
+      setError("Failed to fetch real-time data. Please check the connection.");
+      setIsLoading(false);
+    });
+
+    // Cleanup function to detach the listener when the component unmounts
+    return () => {
+      off(incidentsRef, 'value', unsubscribe);
+    };
+  }, []); // Empty dependency array ensures this runs only once on mount
+
+  // --- Helper functions for data transformation (examples) ---
+  const determineSeverity = (temperature: number | undefined): FireSeverity => {
+    if (!temperature) return "low";
+    if (temperature > 350) return "critical";
+    if (temperature > 250) return "high";
+    if (temperature > 100) return "medium";
+    return "low";
+  };
+
+  const determineStatus = (statusValue: unknown): FireIncident['status'] => {
+    // Add logic based on your data, e.g., if response units are present, etc.
+    if (typeof statusValue === "string" && ["active", "responding", "contained", "extinguished"].includes(statusValue)) {
+        return statusValue as FireIncident['status'];
+    }
+    return "active"; // Default to active
+  };
+  // --- End Helper functions ---
 
   useEffect(() => {
     // Filter incidents based on selected area
     if (selectedArea === "all") {
-      setFilteredIncidents(sampleFireIncidents);
+      setFilteredIncidents(allIncidents);
     } else {
       setFilteredIncidents(
-        sampleFireIncidents.filter(incident => incident.location.area === selectedArea)
+        allIncidents.filter(incident => incident.location.area === selectedArea)
       );
     }
 
     // Count active incidents
     setActiveIncidentsCount(
-      sampleFireIncidents.filter(incident => incident.status === "active").length
+      allIncidents.filter(incident => incident.status === "active").length
     );
 
-    // Set default selected incident if none is selected
-    if (!selectedIncident && sampleFireIncidents.length > 0) {
-      setSelectedIncident(sampleFireIncidents[0]);
+    // Set default selected incident if none is selected or if the selected one is filtered out
+    const currentFilteredIds = filteredIncidents.map(inc => inc.incidentId);
+    if (!selectedIncident || !currentFilteredIds.includes(selectedIncident.incidentId)) {
+        setSelectedIncident(filteredIncidents.length > 0 ? filteredIncidents[0] : null);
     }
-  }, [selectedArea, selectedIncident]);
+  }, [selectedArea, allIncidents, filteredIncidents, selectedIncident]); // Update filtering when allIncidents or selectedArea changes
 
   // Function to simulate new fire alert
   const simulateNewAlert = () => {
@@ -254,18 +252,19 @@ const LiveFireDashboard = () => {
 
   // Function to verify a report (would connect to backend in real app)
   const verifyReport = (id: string) => {
-    // Find and update the incident
-    const updatedIncidents = filteredIncidents.map(incident => 
-      incident.incidentId === id 
-        ? {...incident, verifiedReports: incident.verifiedReports + 1} 
+    // This function might need to interact with Firebase to update the count there
+    // For now, it just updates the local state for demonstration
+    const updatedAllIncidents = allIncidents.map(incident =>
+      incident.incidentId === id
+        ? {...incident, verifiedReports: incident.verifiedReports + 1}
         : incident
     );
-    setFilteredIncidents(updatedIncidents);
-    
+    setAllIncidents(updatedAllIncidents); // Update the source data
+
     // Update selected incident if it's the one being verified
     if (selectedIncident && selectedIncident.incidentId === id) {
       setSelectedIncident({
-        ...selectedIncident, 
+        ...selectedIncident,
         verifiedReports: selectedIncident.verifiedReports + 1
       });
     }
@@ -289,7 +288,7 @@ const LiveFireDashboard = () => {
             <p className="text-white/80 text-lg mb-6">
               Real-time fire visualization with sensor data & crowdsourced updates
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
               <div className="flex-1">
                 <Select value={selectedArea} onValueChange={setSelectedArea}>
@@ -306,13 +305,13 @@ const LiveFireDashboard = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="flex items-center gap-4">
                 <Badge className="bg-red-600 text-white px-3 py-1 text-sm">
                   {activeIncidentsCount} Active Fires
                 </Badge>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="border-fire text-fire hover:bg-fire/20 hover:text-white"
                   onClick={simulateNewAlert}
                 >
@@ -322,7 +321,20 @@ const LiveFireDashboard = () => {
             </div>
           </div>
         </div>
-        
+
+        {/* Loading and Error States */}
+        {isLoading && (
+          <div className="my-6 text-center">
+            <p className="text-white/80 mb-2">Connecting to live feed...</p>
+            <Progress value={50} className="w-1/2 mx-auto bg-gray-700 [&>*]:bg-fire" />
+          </div>
+        )}
+        {error && (
+          <div className="my-6 p-4 bg-red-900/50 border border-red-500/50 rounded-lg text-center text-red-300">
+            {error}
+          </div>
+        )}
+
         {/* Main Dashboard Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column: Fire Incidents List */}
@@ -334,13 +346,15 @@ const LiveFireDashboard = () => {
                   Fire Incidents
                 </CardTitle>
                 <CardDescription className="text-white/70">
-                  {filteredIncidents.length} incidents detected in selected area(s)
+                  {isLoading ? 'Loading...' :
+                   error ? 'Error loading' :
+                   `${filteredIncidents.length} incidents in selected area(s)}`}
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-0 max-h-[60vh] overflow-y-auto">
                 <div className="divide-y divide-fire/10">
                   {filteredIncidents.map((incident) => (
-                    <div 
+                    <div
                       key={incident.incidentId}
                       className={`p-4 hover:bg-fire/10 cursor-pointer transition-colors ${
                         selectedIncident?.incidentId === incident.incidentId ? "bg-fire/20" : ""
@@ -358,11 +372,11 @@ const LiveFireDashboard = () => {
                           {incident.severity.toUpperCase()}
                         </Badge>
                       </div>
-                      
+
                       <div className="text-white/90 text-sm mb-1 truncate">
                         {incident.location.address}
                       </div>
-                      
+
                       <div className="flex items-center justify-between text-sm text-white/70">
                         <div className="flex items-center">
                           {getSourceIcon(incident.source)}
@@ -375,8 +389,8 @@ const LiveFireDashboard = () => {
                       </div>
                     </div>
                   ))}
-                  
-                  {filteredIncidents.length === 0 && (
+
+                  {!isLoading && !error && filteredIncidents.length === 0 && (
                     <div className="p-6 text-center text-white/50">
                       No fire incidents in this area
                     </div>
@@ -385,7 +399,7 @@ const LiveFireDashboard = () => {
               </CardContent>
             </Card>
           </div>
-          
+
           {/* Right Column: Map & Details */}
           <div className="lg:col-span-2">
             <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
@@ -400,15 +414,15 @@ const LiveFireDashboard = () => {
                   Risk Analysis
                 </TabsTrigger>
               </TabsList>
-              
+
               {/* Map View */}
               <TabsContent value="map" className="mt-4">
                 <Card className="bg-black/80 border-fire/30">
                   <CardContent className="p-0">
                     <div className="relative w-full h-[60vh] bg-gray-900">
-                      <MapContainer 
-                        center={[22.5726, 88.3639]} 
-                        zoom={12} 
+                      <MapContainer
+                        center={[22.5726, 88.3639]}
+                        zoom={12}
                         style={{ height: '100%', width: '100%' }}
                         className="z-0"
                       >
@@ -416,7 +430,7 @@ const LiveFireDashboard = () => {
                           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         />
-                        
+
                         {filteredIncidents.map((incident) => (
                           <Marker
                             key={incident.incidentId}
@@ -434,7 +448,7 @@ const LiveFireDashboard = () => {
                                 {incident.location.area} - {incident.severity.toUpperCase()}
                               </div>
                             </Tooltip>
-                            
+
                             <Popup>
                               <div className="space-y-1">
                                 <h3 className="font-bold">{incident.location.area}</h3>
@@ -446,8 +460,8 @@ const LiveFireDashboard = () => {
                                   </Badge>
                                 </div>
                                 <p className="text-xs">Reported: {formatDate(incident.reportTime)}</p>
-                                <Button 
-                                  size="sm" 
+                                <Button
+                                  size="sm"
                                   className="mt-2 w-full text-xs"
                                   onClick={() => {
                                     setSelectedIncident(incident);
@@ -464,7 +478,7 @@ const LiveFireDashboard = () => {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <div className="mt-4 bg-black/60 border border-fire/20 rounded-lg p-4">
                   <h3 className="text-white/90 font-medium mb-2">Map Legend</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -487,7 +501,7 @@ const LiveFireDashboard = () => {
                   </div>
                 </div>
               </TabsContent>
-              
+
               {/* Incident Details View */}
               <TabsContent value="details" className="mt-4">
                 {selectedIncident ? (
@@ -505,7 +519,7 @@ const LiveFireDashboard = () => {
                         ID: {selectedIncident.incidentId}
                       </CardDescription>
                     </CardHeader>
-                    
+
                     <CardContent className="p-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -516,32 +530,32 @@ const LiveFireDashboard = () => {
                           <p className="text-white/80 mb-4">
                             {selectedIncident.location.address}
                           </p>
-                          
+
                           <h3 className="text-fire font-medium mb-2">Incident Details</h3>
                           <div className="grid grid-cols-2 gap-2 mb-4">
                             <div className="text-white/70">Status:</div>
                             <div className="text-white font-medium capitalize">
                               {selectedIncident.status.replace('-', ' ')}
                             </div>
-                            
+
                             <div className="text-white/70">Reported:</div>
                             <div className="text-white">
                               {formatDate(selectedIncident.reportTime)}
                             </div>
-                            
+
                             <div className="text-white/70">Source:</div>
                             <div className="text-white capitalize flex items-center">
                               {getSourceIcon(selectedIncident.source)}
                               {selectedIncident.source.replace('-', ' ')}
                             </div>
-                            
+
                             {selectedIncident.temperature && (
                               <>
                                 <div className="text-white/70">Temperature:</div>
                                 <div className="text-white">{selectedIncident.temperature}°C</div>
                               </>
                             )}
-                            
+
                             {selectedIncident.reportedBy && (
                               <>
                                 <div className="text-white/70">Reported by:</div>
@@ -550,24 +564,24 @@ const LiveFireDashboard = () => {
                             )}
                           </div>
                         </div>
-                        
+
                         <div>
                           <h3 className="text-fire font-medium mb-2">Emergency Response</h3>
                           <div className="grid grid-cols-2 gap-2 mb-4">
                             <div className="text-white/70">Evacuation:</div>
                             <div className="text-white">{selectedIncident.evacuationStatus}</div>
-                            
+
                             <div className="text-white/70">Units Responding:</div>
                             <div className="text-white">
                               {selectedIncident.respondingUnits?.join(", ") || "None"}
                             </div>
                           </div>
-                          
+
                           <h3 className="text-fire font-medium mb-2">Details</h3>
                           <p className="text-white/80 mb-4">
                             {selectedIncident.details}
                           </p>
-                          
+
                           <div className="mt-6">
                             <div className="flex items-center justify-between mb-2">
                               <h3 className="text-fire font-medium">Community Verification</h3>
@@ -575,8 +589,8 @@ const LiveFireDashboard = () => {
                                 {selectedIncident.verifiedReports} Confirmations
                               </Badge>
                             </div>
-                            
-                            <Button 
+
+                            <Button
                               className="w-full bg-fire/80 hover:bg-fire text-white"
                               onClick={() => verifyReport(selectedIncident.incidentId)}
                             >
@@ -598,7 +612,7 @@ const LiveFireDashboard = () => {
                   </Card>
                 )}
               </TabsContent>
-              
+
               {/* Risk Analysis View */}
               <TabsContent value="stats" className="mt-4">
                 <Card className="bg-black/80 border-fire/30">
@@ -610,19 +624,19 @@ const LiveFireDashboard = () => {
                       Historical and predictive fire risk patterns
                     </CardDescription>
                   </CardHeader>
-                  
+
                   <CardContent className="p-6">
                     <div className="mb-6">
                       <h3 className="text-fire font-medium mb-3">Area Risk Assessment</h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {kolkataAreas.map((area) => (
-                          <div 
+                          <div
                             key={area.name}
                             className="bg-black/60 border border-fire/20 rounded-lg p-3 hover:border-fire/40 transition-all"
                           >
                             <div className="flex justify-between items-center mb-2">
                               <h4 className="text-white font-medium">{area.name}</h4>
-                              <Badge 
+                              <Badge
                                 className={
                                   area.riskLevel === "high" ? "bg-red-500 text-white" :
                                   area.riskLevel === "medium" ? "bg-yellow-500 text-black" :
@@ -639,7 +653,7 @@ const LiveFireDashboard = () => {
                         ))}
                       </div>
                     </div>
-                    
+
                     <div className="mb-6">
                        <h3 className="text-fire font-medium mb-3">Monthly Fire Incident Trends</h3>
                        <div className="bg-black/40 border border-fire/20 rounded-lg p-4 h-64">
@@ -670,7 +684,7 @@ const LiveFireDashboard = () => {
                        </div>
                  </div>
 
-                    
+
                     <div>
                       <h3 className="text-fire font-medium mb-3">Risk Factors</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -683,7 +697,7 @@ const LiveFireDashboard = () => {
                             <li>Old buildings with outdated wiring</li>
                           </ul>
                         </div>
-                        
+
                         <div className="bg-black/40 border border-fire/20 rounded-lg p-4">
                           <h4 className="text-white font-medium mb-2">Seasonal Factors</h4>
                           <ul className="list-disc list-inside text-white/80 space-y-1">
