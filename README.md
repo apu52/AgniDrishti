@@ -70,7 +70,7 @@ To develop an **advanced IoT & AI-powered fire safety solution** that integrates
 
 | Repo | Link |
 |------|------|
-| 🔗 Frontend Repo | [Add link here] |
+| 🔗 Frontend Repo | [https://github.com/apu52/AgniDrishti/] |
 | 🔗 Backend Repo | [(https://github.com/Sebanti2003/agnidrishtibackend)] |
 | 🔗 Hardware Repo | [https://github.com/TechFreak2003/Agnidrishti_Hardware_SBH2025] |
 
@@ -88,10 +88,11 @@ To develop an **advanced IoT & AI-powered fire safety solution** that integrates
 
 | Name              | Branch | Degree | Year | University | Role         |
 |-------------------|--------|--------|------|------------|--------------|
-| Arpan Chowdhury   | CSE    | B.Tech | 3rd  | Netaji Subhash Engineering College | Team Leader |
-| Himadri Dey       | IT     | B.Tech | 3rd  | Netaji Subhash Engineering College | Member |
-| Sebanti Dasgupta  | CSE    | B.Tech | 3rd  | Netaji Subhash Engineering College | Member |
-| Suvrodeep Das     | CSE    | B.Tech | 3rd  | Netaji Subhash Engineering College | Member |
+| Himadri Dey       | IT     | B.Tech | 3rd  | Netaji Subhash Engineering College | Backend Developer |
+| Sebanti Dasgupta  | CSE    | B.Tech | 3rd  | Netaji Subhash Engineering College | Backend Developer |
+| Suvrodeep Das     | CSE    | B.Tech | 3rd  | Netaji Subhash Engineering College | Hardware Expert |
+| Arpan Chowdhury   | CSE    | B.Tech | 3rd  | Netaji Subhash Engineering College | Frontend Developer |
+
 
 ---
 
