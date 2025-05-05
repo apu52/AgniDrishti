@@ -1,122 +1,112 @@
+# 🔥 Agnidrishti - AI & IoT Powered Fire Safety Solution 🚒
 
 
-# 🔥 AgniDrishti – Intelligent Fire Detection System
-**AgniDrishti** is an advanced fire detection system leveraging computer vision and machine learning to identify fire hazards in real-time. Designed to enhance safety measures, it provides prompt alerts to mitigate potential fire-related disasters
+![image](https://github.com/user-attachments/assets/d8908bd1-798d-4cd0-b6b3-619ba14cb35e)
 
----
 
-## 🌟 Features
-
-- **🔥 Real-Time Fire Detection*: Utilizes cutting-edge algorithms to detect fire in live video fees.
-- **📷 Camera Integration*: Seamlessly integrates with various camera systems for continuous monitorng.
-- **🔔 Instant Alert**: Sends immediate notifications upon fire detection to designated personel.
-- **📊 Analytics Dashboad**: Provides insightful analytics on fire incidents and system perforance.
-- **🛡️ Secure & Reliale**: Ensures data security and system reliability for critical enviroments.
+**Smart Bengal Hackathon (SBH-Sr) 2025**  
+🏆 **Team Name:** PyroSentinel  
+📁 **Category:** Hardware (Open Innovation)  
+📌 **PS No.:** SBHRCCIITXXX  
 
 ---
 
-## 🛠️ TechStack
+## 🚀 Objective
 
-| Technology       | Description                                |
-|------------------|--------------------------------------------|
-| **Frontend**     | React.js, Tailwind CSS                     |
-| **Backend**      | Node.js, Express.js                        |
-| **Machine Learning** | TensorFlow, OpenCV                     |
-| **Database**     | MongoDB                                    |
-| **Deployment**   | Docker, AWS                               |
+To develop an **advanced IoT & AI-powered fire safety solution** that integrates **real-time detection**, **risk mapping**, and **emergency response** for minimizing casualties and property damage in high-risk zones.
 
 ---
 
-## 🚀 Getting Started
+## 🌍 Societal Benefit / Target Community
 
-Follow these steps to set up the project locally:
-
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/apu52/AgniDrishti.gi
-   ```
-
-
-2. **Navigate to the Project Directory**:
-   ```bash
-   cd AgniDrisht
-   ```
-
-
-3. **Install Dependencies**:
-   ```bash
-   npm instal
-   ```
-
-
-4. **Set Up Environment Variables*:
-   - Create a `.env` file in the root drectory
-   - Add the necessary environment variables as specified in `.env.xample`.
-
-5. **Start the Development Server**:
-   ```bash
-   npm run de
-   ```
-
-
-   The application will be running at `http://localhost:3000`.
+- Rapid fire detection & response ⏱️
+- Enhanced public & industrial fire safety 🏭
+- Support for firefighters, emergency responders & city administrations 👨‍🚒
+- Focused on Bengal’s high-risk zones like **Kolkata, Howrah, Siliguri** 🔥
+- Targets slums & congested neighborhoods with poor fire infrastructure 🏘️
 
 ---
 
-## 📂 Project Sructure
+## 💡 Novelty & Literature Survey
 
-
-```plaintext
-AgniDrishti/
-├── public/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   ├── assets/
-│   └── ...
-├── .env.example
-├── .gitignore
-├── package.json
-├── README.md
-└─ ...
-```
-
+| Feature | Existing Systems | Agnidrishti Advantage |
+|--------|------------------|------------------------|
+| Detection | Delayed smoke-only sensors | Real-time AI + IoT alerts |
+| Integration | Rarely integrated | Fully integrated platform |
+| Localization | No regional focus | Bengal-specific deployment |
+| Language Support | Monolingual | Multilingual emergency support 🌐 |
+| Validation | Centralized | Crowdsourced alerts 📱 |
 
 ---
 
-## 🤝 Contributing
+## 🧠 Features
 
-We welcome contributions to enhance **AgniDrishti**! To contribute:
+✅ Smart Fire Alert Sensor  
+✅ Fire Risk Zone Mapping  
+✅ Live Fire Tracking Dashboard  
+✅ SOS Panic Button & Helpline  
+✅ AI Crisis Chatbot 🤖  
+✅ Multi-Agency Complaint Portal  
+✅ Crowdsourced Alerts  
+✅ Voice-Activated Emergency Mode 🎙️  
+✅ Prevention Guides & Protocols  
+✅ Post-Fire Analysis & Reports 📊
 
-1. **Fork the Repsitory**: Click on the 'Fork' button at the top right of the repostory page.
-2. **Clone Your Fork**:
-   ```bash
-   git clone https://github.com/your-username/AgniDrishti.it
-   ```
-
-3. **Create a New Branch**:
-   ```bash
-   git checkout -b feature/your-feature-nme
-   ```
-
-4. **Make Your hanges**: Implement your featre or fix.
-5. **Commit Your Changes**:
-   ```bash
-   git commit -m "Add your commit message hee"
-   ```
-
-6. **Push to Your Fork**:
-   ```bash
-   git push origin feature/your-feature-nme
-   ```
-
-7. **Create a Pull equest**: Navigate to the original repository and click on 'New Pul Request'.
+
 
 ---
 
-## �️ License
+## 🧰 Components & Tech Stack
 
-This project is licensed under the [MIT Licens](LICENSE).
+| Component | Description |
+|----------|-------------|
+| Hardware | IoT Sensors, Microcontrollers, Panic Buttons |
+| Software | Python, AI/ML Models, Firebase, Web Dashboard |
+| Cost Estimate | *(Add total budget here)* |
 
+---
 
+## 📦 Repositories
 
+| Repo | Link |
+|------|------|
+| 🔗 Frontend Repo | [Add link here] |
+| 🔗 Backend Repo | [(https://github.com/Sebanti2003/agnidrishtibackend)] |
+| 🔗 Hardware Repo | [https://github.com/TechFreak2003/Agnidrishti_Hardware_SBH2025] |
+
+---
+
+## 📽️ Project Demonstration
+
+- 🎥 [Project Demo Video](https://drive.google.com/drive/folders/18cT6864HT63d2ENbc-OQHbwbxe04_LLZ?usp=sharing)  
+- 📊 [Pitch Deck](https://www.canva.com/design/DAGjX-3L7l0/qZjkXeM1r-pV1MvVvru4QA/edit?utm_content=DAGjX-3L7l0&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)  
+- 🌐 [Live Demo](https://agni-drishti.vercel.app/)
+
+---
+
+## 🧑‍💻 Team Members
+
+| Name              | Branch | Degree | Year | University | Role         |
+|-------------------|--------|--------|------|------------|--------------|
+| Arpan Chowdhury   | CSE    | B.Tech | 3rd  | Netaji Subhash Engineering College | Team Leader |
+| Himadri Dey       | IT     | B.Tech | 3rd  | Netaji Subhash Engineering College | Member |
+| Sebanti Dasgupta  | CSE    | B.Tech | 3rd  | Netaji Subhash Engineering College | Member |
+| Suvrodeep Das     | CSE    | B.Tech | 3rd  | Netaji Subhash Engineering College | Member |
+
+---
+
+## 🎓 Mentor
+
+- **Name:** Sukanta Bose  
+- **College:** Netaji Subhash Engineering College  
+- **Department:** IT
+
+---
+
+## 📫 Contact
+
+For queries or collaborations, feel free to contact us through GitHub or email!
+
+---
+
+> 🛡️ Designed with a mission to **save lives** and empower **emergency response systems** with **cutting-edge technology**.
