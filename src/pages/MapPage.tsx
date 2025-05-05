@@ -17,8 +17,8 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 // Mock fire risk data
 const mockFireRisks = [
-  { id: 1, lat: 22.5726, lng: 88.3639, risk: 'High', description: 'Industrial area with frequent electrical fires' },
-  { id: 2, lat: 22.5214, lng: 88.3437, risk: 'Medium', description: 'Dense residential zone with poor wiring' },
+  { id: 1, lat: 22.5581, lng: 88.3961, risk: 'High', description: 'Industrial area with frequent electrical fires' },
+  
 ];
 
 // Component to handle map view changes
@@ -26,7 +26,7 @@ function MapViewUpdater({ center, zoom }: { center: [number, number]; zoom: numb
   const map = useMap();
   useEffect(() => {
     map.setView(center, zoom);
-  }, [center, zoom]);
+  }, [center, map, zoom]);
   return null;
 }
 
