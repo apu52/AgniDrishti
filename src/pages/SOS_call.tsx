@@ -225,36 +225,33 @@ const SOSPanicButton = () => {
     }, 2000);
   };
   const messagetoemergencycontacts = async (contacts: EmergencyContact[]) => {
-    try {
-      setSosActivated(true);
-      for (let i = 0; i < contacts.length; i++) {
-        const contact = contacts[i];
-        const message = `Hi ${contact.name} Sebanti Dasgupta this side. I am in a fire emergency right now. Please help me. My Address is 1/1b Raipur East Road Kolkata: 700032 near Jadavpur University 
-        Kolkata Fire Services: 101 , Kolkata Police : 100, Emergency Ambulance : 108 , Disaster Management : 1070`;
-        const call = await axios.post(
-          "https://agnidrishtibackend.onrender.com/api/v1/send-sms",
-          {
-            toNumber: contact.phone,
-            message: message,
-          }
-        );
-        console.log(call);
-        alert(
-          "SOS activated! Emergency services have been notified and your location has been shared with your emergency contacts."
-        );
-        setSosActivated(false);
-      }
-    } 
-
- catch (error) {
-       console.log(error);
-
-       alert("Failed to send SMS");
-       setSosActivated(false);
-     } finally {
-       setSosActivated(false);
-     }
-  };
+  try {
+    setSosActivated(true);
+    for (let i = 0; i < contacts.length; i++) {
+      const contact = contacts[i];
+      const message = `Hi ${contact.name} Sebanti Dasgupta this side. I am in a fire emergency right now. Please help me. My Address is 1/1b Raipur East Road Kolkata: 700032 near Jadavpur University 
+      Kolkata Fire Services: 101 , Kolkata Police : 100, Emergency Ambulance : 108 , Disaster Management : 1070`;
+      const call = await axios.post(
+        "https://agnidrishtibackend.onrender.com/api/v1/send-sms",
+        {
+          toNumber: contact.phone,
+          message: message,
+        }
+      );
+      console.log(call);
+      alert(
+        "SOS activated! Emergency services have been notified and your location has been shared with your emergency contacts."
+      );
+      setSosActivated(false);
+    }
+  } catch (error) {
+    console.log(error);
+    alert("Failed to send SMS");
+    setSosActivated(false);
+  } finally {
+    setSosActivated(false);
+  }
+};
 
   // Handle adding a new contact
   const handleAddContact = () => {
