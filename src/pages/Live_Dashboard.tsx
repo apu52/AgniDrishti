@@ -18,10 +18,8 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from 'recharts';
-// --- Firebase Imports ---
-import { database } from "@/firebase-config"; // Adjust path if needed
-import { ref, onValue, off } from "firebase/database";
-// --- End Firebase Imports ---
+import { database } from "@/firebase-config";
+import { ref, onValue } from "firebase/database";
 
 import $ from 'jquery';
 
@@ -199,9 +197,7 @@ const LiveFireDashboard = () => {
     });
 
     // Cleanup function to detach the listener when the component unmounts
-    return () => {
-      off(incidentsRef, 'value', unsubscribe);
-    };
+    return unsubscribe;
   }, []); // Empty dependency array ensures this runs only once on mount
 
   // --- Helper functions for data transformation (examples) ---
